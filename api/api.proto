@@ -119,6 +119,8 @@ message DeleteClusterReply {
 }
 
 message GetClusterListMsg {
+    // Credentials to search subscription for clusters
+    AzureCredentials credentials = 2;
 }
 
 message GetClusterListReply {
@@ -172,13 +174,24 @@ message AzureCredentials {
     string tenant = 2;
     // The Password for API access
     string password = 3;
+    // The Subscription for API access
+    string subscription_id = 4;
 }
 
+// the account used by the cluster to create azure resources (ex: load balancer)
+message AzureClusterServiceAccount {
+    // The ClientId (aka: AppID)
+    string client_id = 1;
+    // The ClientSecret (aka: password)
+    string client_secret = 2;
+}
 message CreateClusterAKSSpec {
     // The Azure Data Center
     string location = 1;
     // Credentials to build the cluster
     AzureCredentials credentials = 2;
+    // Cluster service account used to talk to azure (ex: creating load balancer)
+    AzureClusterServiceAccount clusterAccount = 3;
     // Instance groups
     repeated AKSInstanceGroup instance_groups = 4;
 

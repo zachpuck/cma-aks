@@ -2,6 +2,52 @@
 
 
 [[projects]]
+  digest = "1:5a5ac3f913fb4ba3507aac6123eac0460422641b4b7fce44a9c02569759a075e"
+  name = "github.com/Azure/azure-sdk-for-go"
+  packages = [
+    "services/containerservice/mgmt/2018-03-31/containerservice",
+    "services/resources/mgmt/2018-05-01/resources",
+    "version",
+  ]
+  pruneopts = "UT"
+  revision = "2935c0241c74bd8549b843978dd6fc1be6f48b4a"
+  version = "v20.1.0"
+
+[[projects]]
+  digest = "1:3f452316e4eea790036bdf657d586f3d72a4c0cc2490bceb247207beabd886f2"
+  name = "github.com/Azure/go-autorest"
+  packages = [
+    "autorest",
+    "autorest/adal",
+    "autorest/azure",
+    "autorest/azure/auth",
+    "autorest/date",
+    "autorest/to",
+    "autorest/validation",
+    "logger",
+    "version",
+  ]
+  pruneopts = "UT"
+  revision = "a35eae345f69bbfbe3b8fa0b1d3fe98f8430b21a"
+  version = "v10.15.3"
+
+[[projects]]
+  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:e608bc2d867c3ded40ccea5417715393a50704ac24004afa87431a0e1976e50d"
+  name = "github.com/dimchansky/utfbom"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5448fe645cb1964ba70ac8f9f2ffe975e61a536c"
+
+[[projects]]
   digest = "1:f4f6279cb37479954644babd8f8ef00584ff9fa63555d2c6718c1c3517170202"
   name = "github.com/elazarl/go-bindata-assetfs"
   packages = ["."]
@@ -289,9 +335,13 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
+  digest = "1:670ac353e434afad9b6d96ba9735f243c5808c58ed67fdce9768e160d84389ba"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "pkcs12",
+    "pkcs12/internal/rc2",
+    "ssh/terminal",
+  ]
   pruneopts = "UT"
   revision = "0709b304e793a5edb4a2c0145f281ecdc20838a4"
 
@@ -593,6 +643,10 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2018-03-31/containerservice",
+    "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources",
+    "github.com/Azure/go-autorest/autorest/azure/auth",
+    "github.com/Azure/go-autorest/autorest/to",
     "github.com/elazarl/go-bindata-assetfs",
     "github.com/golang/protobuf/proto",
     "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options",
