@@ -41,17 +41,19 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	parameters.AgentPoolMaxPods = in.Provider.Azure.InstanceGroups[0].MaxQuantity
 
 	// create cluster
-	c, err := az.CreateCluster(ctx, clusterClient, parameters)
+	status, err := az.CreateCluster(ctx, clusterClient, parameters)
 	if err != nil {
 		return nil, fmt.Errorf("error creating cluster: %v", err)
 	}
 
+	clusterID := "/subscriptions/" + in.Provider.Azure.Credentials.SubscriptionId + "/resourcegroups/" + in.Provider.Name + "-group/providers/Microsoft.ContainerService/managedClusters/" + in.Provider.Name
+
 	return &pb.CreateClusterReply{
 		Ok: true,
 		Cluster: &pb.ClusterItem{
-			Id:     *c.ID,
-			Name:   *c.Name,
-			Status: "Creating",
+			Id:     clusterID,
+			Name:   parameters.Name,
+			Status: status,
 		},
 	}, nil
 }

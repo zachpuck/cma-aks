@@ -63,7 +63,7 @@ func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClust
 }
 
 // CreateCluster creates a new managed Kubernetes cluster
-func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (c containerservice.ManagedCluster, err error) {
+func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (status string, err error) {
 	resourceGroupName := parameters.Name + "-group"
 
 	future, err := clusterClient.CreateOrUpdate(
@@ -88,19 +88,20 @@ func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 					ClientID: to.StringPtr(parameters.ClientID),
 					Secret:   to.StringPtr(parameters.ClientSecret),
 				},
+				// TODO: add tags
 			},
 		},
 	)
 	if err != nil {
-		return c, fmt.Errorf("cannot create aks cluster: %v", err)
+		return "", fmt.Errorf("cannot create aks cluster: %v", err)
 	}
 
-	err = future.WaitForCompletion(ctx, clusterClient.Client)
-	if err != nil {
-		return c, fmt.Errorf("cannot get the aks cluster create or update future response: %v", err)
+	status = future.Status()
+	if status != "Creating" {
+		return "", fmt.Errorf("cannot create cluster: %v", status)
 	}
 
-	return future.Result(clusterClient)
+	return status, nil
 }
 
 // DeleteCluster deletes an existing aks cluster
