@@ -1,9 +1,10 @@
 # Protocol Documentation
-<a name="top"/>
+<a name="top"></a>
 
 ## Table of Contents
 
 - [api.proto](#api.proto)
+    - [AzureClusterServiceAccount](#cmaaks.AzureClusterServiceAccount)
     - [AzureCredentials](#cmaaks.AzureCredentials)
     - [ClusterDetailItem](#cmaaks.ClusterDetailItem)
     - [ClusterItem](#cmaaks.ClusterItem)
@@ -28,6 +29,7 @@
   
 
 - [api.proto](#api.proto)
+    - [AzureClusterServiceAccount](#cmaaks.AzureClusterServiceAccount)
     - [AzureCredentials](#cmaaks.AzureCredentials)
     - [ClusterDetailItem](#cmaaks.ClusterDetailItem)
     - [ClusterItem](#cmaaks.ClusterItem)
@@ -55,14 +57,30 @@
 
 
 
-<a name="api.proto"/>
+<a name="api.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## api.proto
 
 
 
-<a name="cmaaks.AzureCredentials"/>
+<a name="cmaaks.AzureClusterServiceAccount"></a>
+
+### AzureClusterServiceAccount
+the account used by the cluster to create azure resources (ex: load balancer)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| client_id | [string](#string) |  | The ClientId (aka: AppID) |
+| client_secret | [string](#string) |  | The ClientSecret (aka: password) |
+
+
+
+
+
+
+<a name="cmaaks.AzureCredentials"></a>
 
 ### AzureCredentials
 The credentials to use for creating the cluster
@@ -73,13 +91,14 @@ The credentials to use for creating the cluster
 | app_id | [string](#string) |  | The AppId for API Access |
 | tenant | [string](#string) |  | The Tenant for API access |
 | password | [string](#string) |  | The Password for API access |
+| subscription_id | [string](#string) |  | The Subscription for API access |
 
 
 
 
 
 
-<a name="cmaaks.ClusterDetailItem"/>
+<a name="cmaaks.ClusterDetailItem"></a>
 
 ### ClusterDetailItem
 
@@ -97,7 +116,7 @@ The credentials to use for creating the cluster
 
 
 
-<a name="cmaaks.ClusterItem"/>
+<a name="cmaaks.ClusterItem"></a>
 
 ### ClusterItem
 
@@ -114,7 +133,7 @@ The credentials to use for creating the cluster
 
 
 
-<a name="cmaaks.CreateClusterAKSSpec"/>
+<a name="cmaaks.CreateClusterAKSSpec"></a>
 
 ### CreateClusterAKSSpec
 
@@ -124,6 +143,7 @@ The credentials to use for creating the cluster
 | ----- | ---- | ----- | ----------- |
 | location | [string](#string) |  | The Azure Data Center |
 | credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to build the cluster |
+| clusterAccount | [AzureClusterServiceAccount](#cmaaks.AzureClusterServiceAccount) |  | Cluster service account used to talk to azure (ex: creating load balancer) |
 | instance_groups | [CreateClusterAKSSpec.AKSInstanceGroup](#cmaaks.CreateClusterAKSSpec.AKSInstanceGroup) | repeated | Instance groups |
 
 
@@ -131,7 +151,7 @@ The credentials to use for creating the cluster
 
 
 
-<a name="cmaaks.CreateClusterAKSSpec.AKSInstanceGroup"/>
+<a name="cmaaks.CreateClusterAKSSpec.AKSInstanceGroup"></a>
 
 ### CreateClusterAKSSpec.AKSInstanceGroup
 Instance groups define a type and number of instances
@@ -149,7 +169,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.CreateClusterMsg"/>
+<a name="cmaaks.CreateClusterMsg"></a>
 
 ### CreateClusterMsg
 
@@ -165,7 +185,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.CreateClusterProviderSpec"/>
+<a name="cmaaks.CreateClusterProviderSpec"></a>
 
 ### CreateClusterProviderSpec
 
@@ -184,7 +204,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.CreateClusterReply"/>
+<a name="cmaaks.CreateClusterReply"></a>
 
 ### CreateClusterReply
 
@@ -200,7 +220,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.DeleteClusterMsg"/>
+<a name="cmaaks.DeleteClusterMsg"></a>
 
 ### DeleteClusterMsg
 
@@ -216,7 +236,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.DeleteClusterReply"/>
+<a name="cmaaks.DeleteClusterReply"></a>
 
 ### DeleteClusterReply
 
@@ -232,17 +252,22 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetClusterListMsg"/>
+<a name="cmaaks.GetClusterListMsg"></a>
 
 ### GetClusterListMsg
 
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to search subscription for clusters |
 
 
 
 
-<a name="cmaaks.GetClusterListReply"/>
+
+
+<a name="cmaaks.GetClusterListReply"></a>
 
 ### GetClusterListReply
 
@@ -258,7 +283,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetClusterMsg"/>
+<a name="cmaaks.GetClusterMsg"></a>
 
 ### GetClusterMsg
 
@@ -274,7 +299,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetClusterReply"/>
+<a name="cmaaks.GetClusterReply"></a>
 
 ### GetClusterReply
 
@@ -290,7 +315,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetVersionMsg"/>
+<a name="cmaaks.GetVersionMsg"></a>
 
 ### GetVersionMsg
 Get version of API Server
@@ -300,7 +325,7 @@ Get version of API Server
 
 
 
-<a name="cmaaks.GetVersionReply"/>
+<a name="cmaaks.GetVersionReply"></a>
 
 ### GetVersionReply
 Reply for version request
@@ -316,7 +341,7 @@ Reply for version request
 
 
 
-<a name="cmaaks.GetVersionReply.VersionInformation"/>
+<a name="cmaaks.GetVersionReply.VersionInformation"></a>
 
 ### GetVersionReply.VersionInformation
 
@@ -343,31 +368,47 @@ Reply for version request
  
 
 
-<a name="cmaaks.Cluster"/>
+<a name="cmaaks.Cluster"></a>
 
 ### Cluster
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateCluster | [CreateClusterMsg](#cmaaks.CreateClusterMsg) | [CreateClusterReply](#cmaaks.CreateClusterMsg) | Will provision a cluster |
-| GetCluster | [GetClusterMsg](#cmaaks.GetClusterMsg) | [GetClusterReply](#cmaaks.GetClusterMsg) | Will retrieve the status of a cluster and its kubeconfig for connectivity |
-| DeleteCluster | [DeleteClusterMsg](#cmaaks.DeleteClusterMsg) | [DeleteClusterReply](#cmaaks.DeleteClusterMsg) | Will delete a cluster |
-| GetClusterList | [GetClusterListMsg](#cmaaks.GetClusterListMsg) | [GetClusterListReply](#cmaaks.GetClusterListMsg) | Will retrieve a list of clusters |
-| GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionMsg) | Will return version information about api server |
+| CreateCluster | [CreateClusterMsg](#cmaaks.CreateClusterMsg) | [CreateClusterReply](#cmaaks.CreateClusterReply) | Will provision a cluster |
+| GetCluster | [GetClusterMsg](#cmaaks.GetClusterMsg) | [GetClusterReply](#cmaaks.GetClusterReply) | Will retrieve the status of a cluster and its kubeconfig for connectivity |
+| DeleteCluster | [DeleteClusterMsg](#cmaaks.DeleteClusterMsg) | [DeleteClusterReply](#cmaaks.DeleteClusterReply) | Will delete a cluster |
+| GetClusterList | [GetClusterListMsg](#cmaaks.GetClusterListMsg) | [GetClusterListReply](#cmaaks.GetClusterListReply) | Will retrieve a list of clusters |
+| GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionReply) | Will return version information about api server |
 
  
 
 
 
-<a name="api.proto"/>
+<a name="api.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## api.proto
 
 
 
-<a name="cmaaks.AzureCredentials"/>
+<a name="cmaaks.AzureClusterServiceAccount"></a>
+
+### AzureClusterServiceAccount
+the account used by the cluster to create azure resources (ex: load balancer)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| client_id | [string](#string) |  | The ClientId (aka: AppID) |
+| client_secret | [string](#string) |  | The ClientSecret (aka: password) |
+
+
+
+
+
+
+<a name="cmaaks.AzureCredentials"></a>
 
 ### AzureCredentials
 The credentials to use for creating the cluster
@@ -378,13 +419,14 @@ The credentials to use for creating the cluster
 | app_id | [string](#string) |  | The AppId for API Access |
 | tenant | [string](#string) |  | The Tenant for API access |
 | password | [string](#string) |  | The Password for API access |
+| subscription_id | [string](#string) |  | The Subscription for API access |
 
 
 
 
 
 
-<a name="cmaaks.ClusterDetailItem"/>
+<a name="cmaaks.ClusterDetailItem"></a>
 
 ### ClusterDetailItem
 
@@ -402,7 +444,7 @@ The credentials to use for creating the cluster
 
 
 
-<a name="cmaaks.ClusterItem"/>
+<a name="cmaaks.ClusterItem"></a>
 
 ### ClusterItem
 
@@ -419,7 +461,7 @@ The credentials to use for creating the cluster
 
 
 
-<a name="cmaaks.CreateClusterAKSSpec"/>
+<a name="cmaaks.CreateClusterAKSSpec"></a>
 
 ### CreateClusterAKSSpec
 
@@ -429,6 +471,7 @@ The credentials to use for creating the cluster
 | ----- | ---- | ----- | ----------- |
 | location | [string](#string) |  | The Azure Data Center |
 | credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to build the cluster |
+| clusterAccount | [AzureClusterServiceAccount](#cmaaks.AzureClusterServiceAccount) |  | Cluster service account used to talk to azure (ex: creating load balancer) |
 | instance_groups | [CreateClusterAKSSpec.AKSInstanceGroup](#cmaaks.CreateClusterAKSSpec.AKSInstanceGroup) | repeated | Instance groups |
 
 
@@ -436,7 +479,7 @@ The credentials to use for creating the cluster
 
 
 
-<a name="cmaaks.CreateClusterAKSSpec.AKSInstanceGroup"/>
+<a name="cmaaks.CreateClusterAKSSpec.AKSInstanceGroup"></a>
 
 ### CreateClusterAKSSpec.AKSInstanceGroup
 Instance groups define a type and number of instances
@@ -454,7 +497,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.CreateClusterMsg"/>
+<a name="cmaaks.CreateClusterMsg"></a>
 
 ### CreateClusterMsg
 
@@ -470,7 +513,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.CreateClusterProviderSpec"/>
+<a name="cmaaks.CreateClusterProviderSpec"></a>
 
 ### CreateClusterProviderSpec
 
@@ -489,7 +532,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.CreateClusterReply"/>
+<a name="cmaaks.CreateClusterReply"></a>
 
 ### CreateClusterReply
 
@@ -505,7 +548,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.DeleteClusterMsg"/>
+<a name="cmaaks.DeleteClusterMsg"></a>
 
 ### DeleteClusterMsg
 
@@ -521,7 +564,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.DeleteClusterReply"/>
+<a name="cmaaks.DeleteClusterReply"></a>
 
 ### DeleteClusterReply
 
@@ -537,17 +580,22 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetClusterListMsg"/>
+<a name="cmaaks.GetClusterListMsg"></a>
 
 ### GetClusterListMsg
 
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to search subscription for clusters |
 
 
 
 
-<a name="cmaaks.GetClusterListReply"/>
+
+
+<a name="cmaaks.GetClusterListReply"></a>
 
 ### GetClusterListReply
 
@@ -563,7 +611,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetClusterMsg"/>
+<a name="cmaaks.GetClusterMsg"></a>
 
 ### GetClusterMsg
 
@@ -579,7 +627,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetClusterReply"/>
+<a name="cmaaks.GetClusterReply"></a>
 
 ### GetClusterReply
 
@@ -595,7 +643,7 @@ Instance groups define a type and number of instances
 
 
 
-<a name="cmaaks.GetVersionMsg"/>
+<a name="cmaaks.GetVersionMsg"></a>
 
 ### GetVersionMsg
 Get version of API Server
@@ -605,7 +653,7 @@ Get version of API Server
 
 
 
-<a name="cmaaks.GetVersionReply"/>
+<a name="cmaaks.GetVersionReply"></a>
 
 ### GetVersionReply
 Reply for version request
@@ -621,7 +669,7 @@ Reply for version request
 
 
 
-<a name="cmaaks.GetVersionReply.VersionInformation"/>
+<a name="cmaaks.GetVersionReply.VersionInformation"></a>
 
 ### GetVersionReply.VersionInformation
 
@@ -648,18 +696,18 @@ Reply for version request
  
 
 
-<a name="cmaaks.Cluster"/>
+<a name="cmaaks.Cluster"></a>
 
 ### Cluster
 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| CreateCluster | [CreateClusterMsg](#cmaaks.CreateClusterMsg) | [CreateClusterReply](#cmaaks.CreateClusterMsg) | Will provision a cluster |
-| GetCluster | [GetClusterMsg](#cmaaks.GetClusterMsg) | [GetClusterReply](#cmaaks.GetClusterMsg) | Will retrieve the status of a cluster and its kubeconfig for connectivity |
-| DeleteCluster | [DeleteClusterMsg](#cmaaks.DeleteClusterMsg) | [DeleteClusterReply](#cmaaks.DeleteClusterMsg) | Will delete a cluster |
-| GetClusterList | [GetClusterListMsg](#cmaaks.GetClusterListMsg) | [GetClusterListReply](#cmaaks.GetClusterListMsg) | Will retrieve a list of clusters |
-| GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionMsg) | Will return version information about api server |
+| CreateCluster | [CreateClusterMsg](#cmaaks.CreateClusterMsg) | [CreateClusterReply](#cmaaks.CreateClusterReply) | Will provision a cluster |
+| GetCluster | [GetClusterMsg](#cmaaks.GetClusterMsg) | [GetClusterReply](#cmaaks.GetClusterReply) | Will retrieve the status of a cluster and its kubeconfig for connectivity |
+| DeleteCluster | [DeleteClusterMsg](#cmaaks.DeleteClusterMsg) | [DeleteClusterReply](#cmaaks.DeleteClusterReply) | Will delete a cluster |
+| GetClusterList | [GetClusterListMsg](#cmaaks.GetClusterListMsg) | [GetClusterListReply](#cmaaks.GetClusterListReply) | Will retrieve a list of clusters |
+| GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionReply) | Will return version information about api server |
 
  
 

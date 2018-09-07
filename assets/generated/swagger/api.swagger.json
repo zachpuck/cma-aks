@@ -60,6 +60,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "credentials.subscription_id",
+            "description": "The Subscription for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -102,6 +109,13 @@
           {
             "name": "credentials.password",
             "description": "The Password for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.subscription_id",
+            "description": "The Subscription for API access.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -149,6 +163,36 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "credentials.app_id",
+            "description": "The AppId for API Access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.tenant",
+            "description": "The Tenant for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.password",
+            "description": "The Password for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.subscription_id",
+            "description": "The Subscription for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "tags": [
           "Cluster"
         ]
@@ -230,6 +274,20 @@
         }
       }
     },
+    "cmaaksAzureClusterServiceAccount": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "title": "The ClientId (aka: AppID)"
+        },
+        "client_secret": {
+          "type": "string",
+          "title": "The ClientSecret (aka: password)"
+        }
+      },
+      "title": "the account used by the cluster to create azure resources (ex: load balancer)"
+    },
     "cmaaksAzureCredentials": {
       "type": "object",
       "properties": {
@@ -244,6 +302,10 @@
         "password": {
           "type": "string",
           "title": "The Password for API access"
+        },
+        "subscription_id": {
+          "type": "string",
+          "title": "The Subscription for API access"
         }
       },
       "title": "The credentials to use for creating the cluster"
@@ -296,6 +358,10 @@
         "credentials": {
           "$ref": "#/definitions/cmaaksAzureCredentials",
           "title": "Credentials to build the cluster"
+        },
+        "clusterAccount": {
+          "$ref": "#/definitions/cmaaksAzureClusterServiceAccount",
+          "title": "Cluster service account used to talk to azure (ex: creating load balancer)"
         },
         "instance_groups": {
           "type": "array",
