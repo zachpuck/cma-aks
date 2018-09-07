@@ -113,9 +113,10 @@ func DeleteCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 		return result, fmt.Errorf("error deleting cluster: %v", err)
 	}
 
-	// FIXME: handle future correctly
-	// https://godoc.org/github.com/Azure/go-autorest/autorest/azure#Future
-	fmt.Println("FUTURE", future)
+	result = future.Status()
+	if result != "InProgress" {
+		return "", fmt.Errorf("current status of delete: %v", result)
+	}
 
 	msg := "Deleting " + resourceName + " cluster"
 
