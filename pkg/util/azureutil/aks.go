@@ -26,6 +26,7 @@ type ClusterParameters struct {
 	ClientID          string
 	ClientSecret      string
 	// vmSize string
+	Tags              map[string]*string
 }
 
 // GetClusterClient creates a new aks cluster client and authorizes access
@@ -88,8 +89,8 @@ func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 					ClientID: to.StringPtr(parameters.ClientID),
 					Secret:   to.StringPtr(parameters.ClientSecret),
 				},
-				// TODO: add tags
 			},
+			Tags: parameters.Tags,
 		},
 	)
 	if err != nil {

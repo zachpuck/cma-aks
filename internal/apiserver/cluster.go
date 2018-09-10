@@ -40,6 +40,12 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	parameters.AgentPoolCount = in.Provider.Azure.InstanceGroups[0].MinQuantity
 	parameters.AgentPoolMaxPods = in.Provider.Azure.InstanceGroups[0].MaxQuantity
 
+	// Tags
+	parameters.Tags = make(map[string]*string)
+	for _, tag := range in.Provider.Azure.Tags {
+		parameters.Tags[tag.Key] = &tag.Value
+	}
+
 	// create cluster
 	status, err := az.CreateCluster(ctx, clusterClient, parameters)
 	if err != nil {

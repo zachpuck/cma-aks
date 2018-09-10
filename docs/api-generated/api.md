@@ -10,6 +10,7 @@
     - [ClusterItem](#cmaaks.ClusterItem)
     - [CreateClusterAKSSpec](#cmaaks.CreateClusterAKSSpec)
     - [CreateClusterAKSSpec.AKSInstanceGroup](#cmaaks.CreateClusterAKSSpec.AKSInstanceGroup)
+    - [CreateClusterAKSSpec.Tags](#cmaaks.CreateClusterAKSSpec.Tags)
     - [CreateClusterMsg](#cmaaks.CreateClusterMsg)
     - [CreateClusterProviderSpec](#cmaaks.CreateClusterProviderSpec)
     - [CreateClusterReply](#cmaaks.CreateClusterReply)
@@ -35,6 +36,7 @@
     - [ClusterItem](#cmaaks.ClusterItem)
     - [CreateClusterAKSSpec](#cmaaks.CreateClusterAKSSpec)
     - [CreateClusterAKSSpec.AKSInstanceGroup](#cmaaks.CreateClusterAKSSpec.AKSInstanceGroup)
+    - [CreateClusterAKSSpec.Tags](#cmaaks.CreateClusterAKSSpec.Tags)
     - [CreateClusterMsg](#cmaaks.CreateClusterMsg)
     - [CreateClusterProviderSpec](#cmaaks.CreateClusterProviderSpec)
     - [CreateClusterReply](#cmaaks.CreateClusterReply)
@@ -145,6 +147,7 @@ The credentials to use for creating the cluster
 | credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to build the cluster |
 | clusterAccount | [AzureClusterServiceAccount](#cmaaks.AzureClusterServiceAccount) |  | Cluster service account used to talk to azure (ex: creating load balancer) |
 | instance_groups | [CreateClusterAKSSpec.AKSInstanceGroup](#cmaaks.CreateClusterAKSSpec.AKSInstanceGroup) | repeated | Instance groups |
+| tags | [CreateClusterAKSSpec.Tags](#cmaaks.CreateClusterAKSSpec.Tags) | repeated | Tags |
 
 
 
@@ -163,6 +166,22 @@ Instance groups define a type and number of instances
 | type | [string](#string) |  | Instance type (Standard_D2_v2, etc.) |
 | min_quantity | [int32](#int32) |  | Minimum number of instances (defaults to zero) |
 | max_quantity | [int32](#int32) |  | Maximum number of instances (defaults to zero) |
+
+
+
+
+
+
+<a name="cmaaks.CreateClusterAKSSpec.Tags"></a>
+
+### CreateClusterAKSSpec.Tags
+Tags are name/value pairs that enable you to categorize resources and view consolidated billing
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  | Tag key |
+| value | [string](#string) |  | Tag value |
 
 
 
@@ -473,6 +492,7 @@ The credentials to use for creating the cluster
 | credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to build the cluster |
 | clusterAccount | [AzureClusterServiceAccount](#cmaaks.AzureClusterServiceAccount) |  | Cluster service account used to talk to azure (ex: creating load balancer) |
 | instance_groups | [CreateClusterAKSSpec.AKSInstanceGroup](#cmaaks.CreateClusterAKSSpec.AKSInstanceGroup) | repeated | Instance groups |
+| tags | [CreateClusterAKSSpec.Tags](#cmaaks.CreateClusterAKSSpec.Tags) | repeated | Tags |
 
 
 
@@ -491,6 +511,22 @@ Instance groups define a type and number of instances
 | type | [string](#string) |  | Instance type (Standard_D2_v2, etc.) |
 | min_quantity | [int32](#int32) |  | Minimum number of instances (defaults to zero) |
 | max_quantity | [int32](#int32) |  | Maximum number of instances (defaults to zero) |
+
+
+
+
+
+
+<a name="cmaaks.CreateClusterAKSSpec.Tags"></a>
+
+### CreateClusterAKSSpec.Tags
+Tags are name/value pairs that enable you to categorize resources and view consolidated billing
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  | Tag key |
+| value | [string](#string) |  | Tag value |
 
 
 
