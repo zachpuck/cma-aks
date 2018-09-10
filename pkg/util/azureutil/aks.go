@@ -20,13 +20,18 @@ type ClusterParameters struct {
 	Name              string
 	Location          string
 	KubernetesVersion string
-	AgentPoolName     string
-	AgentPoolCount    int32
-	AgentPoolMaxPods  int32
 	ClientID          string
 	ClientSecret      string
-	// vmSize string
+	AgentPools        []Agent
 	Tags              map[string]*string
+}
+
+// Agent is used to define properties for each instance group
+type Agent struct {
+	Name    *string
+	Count   *int32
+	MaxPods *int32
+	Type    string
 }
 
 // GetClusterClient creates a new aks cluster client and authorizes access
@@ -67,6 +72,33 @@ func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClust
 func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (status string, err error) {
 	resourceGroupName := parameters.Name + "-group"
 
+	// create map of containerservice.ManagedClusterAgentPoolProfile from parameters.AgentPools
+	agentPoolProfiles := make([]containerservice.ManagedClusterAgentPoolProfile, len(parameters.AgentPools))
+	for i := range parameters.AgentPools {
+		var vmSize containerservice.VMSizeTypes
+
+		// get list of available VM size types
+		vmSizeTypes := containerservice.PossibleVMSizeTypesValues()
+		for j := range vmSizeTypes {
+			// convert the vmSizeTypes to a string
+			typeAsStr := string(vmSizeTypes[j])
+			// compare input type against available vm size types
+			if parameters.AgentPools[i].Type == typeAsStr {
+				vmSize = vmSizeTypes[j]
+			}
+		}
+		if vmSize == "" {
+			return "", fmt.Errorf("invalid VM Size selected")
+		}
+
+		agentPoolProfiles[i] = containerservice.ManagedClusterAgentPoolProfile{
+			Name:    parameters.AgentPools[i].Name,
+			Count:   parameters.AgentPools[i].Count,
+			MaxPods: parameters.AgentPools[i].MaxPods,
+			VMSize:  vmSize,
+		}
+	}
+
 	future, err := clusterClient.CreateOrUpdate(
 		ctx,
 		resourceGroupName,
@@ -77,14 +109,7 @@ func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
 				DNSPrefix:         &parameters.Name,
 				KubernetesVersion: &parameters.KubernetesVersion,
-				AgentPoolProfiles: &[]containerservice.ManagedClusterAgentPoolProfile{
-					{
-						Count:   to.Int32Ptr(parameters.AgentPoolCount),
-						Name:    to.StringPtr(parameters.AgentPoolName),
-						MaxPods: to.Int32Ptr(parameters.AgentPoolMaxPods),
-						VMSize:  containerservice.StandardD2V2, // TODO: add to parameters
-					},
-				},
+				AgentPoolProfiles: &agentPoolProfiles,
 				ServicePrincipalProfile: &containerservice.ManagedClusterServicePrincipalProfile{
 					ClientID: to.StringPtr(parameters.ClientID),
 					Secret:   to.StringPtr(parameters.ClientSecret),

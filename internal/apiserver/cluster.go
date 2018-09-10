@@ -35,10 +35,14 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	parameters.ClientID = in.Provider.Azure.ClusterAccount.ClientId
 	parameters.ClientSecret = in.Provider.Azure.ClusterAccount.ClientSecret
 
-	// FIXME: account for multiple instance groups
-	parameters.AgentPoolName = in.Provider.Azure.InstanceGroups[0].Name
-	parameters.AgentPoolCount = in.Provider.Azure.InstanceGroups[0].MinQuantity
-	parameters.AgentPoolMaxPods = in.Provider.Azure.InstanceGroups[0].MaxQuantity
+	// sets up each instance group agent
+	parameters.AgentPools = make([]az.Agent, len(in.Provider.Azure.InstanceGroups))
+	for i := range in.Provider.Azure.InstanceGroups {
+		parameters.AgentPools[i].Name = &in.Provider.Azure.InstanceGroups[i].Name
+		parameters.AgentPools[i].Count = &in.Provider.Azure.InstanceGroups[i].MinQuantity
+		parameters.AgentPools[i].MaxPods = &in.Provider.Azure.InstanceGroups[i].MaxQuantity
+		parameters.AgentPools[i].Type = in.Provider.Azure.InstanceGroups[i].Type
+	}
 
 	// Tags
 	parameters.Tags = make(map[string]*string)
