@@ -241,6 +241,20 @@
       },
       "title": "Instance groups define a type and number of instances"
     },
+    "CreateClusterAKSSpecTags": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "title": "Tag key"
+        },
+        "value": {
+          "type": "string",
+          "title": "Tag value"
+        }
+      },
+      "title": "Tags are name/value pairs that enable you to categorize resources and view consolidated billing"
+    },
     "GetVersionReplyVersionInformation": {
       "type": "object",
       "properties": {
@@ -369,6 +383,13 @@
             "$ref": "#/definitions/CreateClusterAKSSpecAKSInstanceGroup"
           },
           "title": "Instance groups"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateClusterAKSSpecTags"
+          },
+          "title": "Tags"
         }
       }
     },

@@ -35,23 +35,35 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	parameters.ClientID = in.Provider.Azure.ClusterAccount.ClientId
 	parameters.ClientSecret = in.Provider.Azure.ClusterAccount.ClientSecret
 
-	// FIXME: account for multiple instance groups
-	parameters.AgentPoolName = in.Provider.Azure.InstanceGroups[0].Name
-	parameters.AgentPoolCount = in.Provider.Azure.InstanceGroups[0].MinQuantity
-	parameters.AgentPoolMaxPods = in.Provider.Azure.InstanceGroups[0].MaxQuantity
+	// sets up each instance group agent
+	parameters.AgentPools = make([]az.Agent, len(in.Provider.Azure.InstanceGroups))
+	for i := range in.Provider.Azure.InstanceGroups {
+		parameters.AgentPools[i].Name = &in.Provider.Azure.InstanceGroups[i].Name
+		parameters.AgentPools[i].Count = &in.Provider.Azure.InstanceGroups[i].MinQuantity
+		parameters.AgentPools[i].MaxPods = &in.Provider.Azure.InstanceGroups[i].MaxQuantity
+		parameters.AgentPools[i].Type = in.Provider.Azure.InstanceGroups[i].Type
+	}
+
+	// Tags
+	parameters.Tags = make(map[string]*string)
+	for _, tag := range in.Provider.Azure.Tags {
+		parameters.Tags[tag.Key] = &tag.Value
+	}
 
 	// create cluster
-	c, err := az.CreateCluster(ctx, clusterClient, parameters)
+	status, err := az.CreateCluster(ctx, clusterClient, parameters)
 	if err != nil {
 		return nil, fmt.Errorf("error creating cluster: %v", err)
 	}
 
+	clusterID := "/subscriptions/" + in.Provider.Azure.Credentials.SubscriptionId + "/resourcegroups/" + in.Provider.Name + "-group/providers/Microsoft.ContainerService/managedClusters/" + in.Provider.Name
+
 	return &pb.CreateClusterReply{
 		Ok: true,
 		Cluster: &pb.ClusterItem{
-			Id:     *c.ID,
-			Name:   *c.Name,
-			Status: "Creating",
+			Id:     clusterID,
+			Name:   parameters.Name,
+			Status: status,
 		},
 	}, nil
 }

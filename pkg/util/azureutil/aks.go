@@ -20,12 +20,18 @@ type ClusterParameters struct {
 	Name              string
 	Location          string
 	KubernetesVersion string
-	AgentPoolName     string
-	AgentPoolCount    int32
-	AgentPoolMaxPods  int32
 	ClientID          string
 	ClientSecret      string
-	// vmSize string
+	AgentPools        []Agent
+	Tags              map[string]*string
+}
+
+// Agent is used to define properties for each instance group
+type Agent struct {
+	Name    *string
+	Count   *int32
+	MaxPods *int32
+	Type    string
 }
 
 // GetClusterClient creates a new aks cluster client and authorizes access
@@ -63,8 +69,35 @@ func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClust
 }
 
 // CreateCluster creates a new managed Kubernetes cluster
-func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (c containerservice.ManagedCluster, err error) {
+func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (status string, err error) {
 	resourceGroupName := parameters.Name + "-group"
+
+	// create map of containerservice.ManagedClusterAgentPoolProfile from parameters.AgentPools
+	agentPoolProfiles := make([]containerservice.ManagedClusterAgentPoolProfile, len(parameters.AgentPools))
+	for i := range parameters.AgentPools {
+		var vmSize containerservice.VMSizeTypes
+
+		// get list of available VM size types
+		vmSizeTypes := containerservice.PossibleVMSizeTypesValues()
+		for j := range vmSizeTypes {
+			// convert the vmSizeTypes to a string
+			typeAsStr := string(vmSizeTypes[j])
+			// compare input type against available vm size types
+			if parameters.AgentPools[i].Type == typeAsStr {
+				vmSize = vmSizeTypes[j]
+			}
+		}
+		if vmSize == "" {
+			return "", fmt.Errorf("invalid VM Size selected")
+		}
+
+		agentPoolProfiles[i] = containerservice.ManagedClusterAgentPoolProfile{
+			Name:    parameters.AgentPools[i].Name,
+			Count:   parameters.AgentPools[i].Count,
+			MaxPods: parameters.AgentPools[i].MaxPods,
+			VMSize:  vmSize,
+		}
+	}
 
 	future, err := clusterClient.CreateOrUpdate(
 		ctx,
@@ -76,31 +109,25 @@ func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
 				DNSPrefix:         &parameters.Name,
 				KubernetesVersion: &parameters.KubernetesVersion,
-				AgentPoolProfiles: &[]containerservice.ManagedClusterAgentPoolProfile{
-					{
-						Count:   to.Int32Ptr(parameters.AgentPoolCount),
-						Name:    to.StringPtr(parameters.AgentPoolName),
-						MaxPods: to.Int32Ptr(parameters.AgentPoolMaxPods),
-						VMSize:  containerservice.StandardD2V2, // TODO: add to parameters
-					},
-				},
+				AgentPoolProfiles: &agentPoolProfiles,
 				ServicePrincipalProfile: &containerservice.ManagedClusterServicePrincipalProfile{
 					ClientID: to.StringPtr(parameters.ClientID),
 					Secret:   to.StringPtr(parameters.ClientSecret),
 				},
 			},
+			Tags: parameters.Tags,
 		},
 	)
 	if err != nil {
-		return c, fmt.Errorf("cannot create aks cluster: %v", err)
+		return "", fmt.Errorf("cannot create aks cluster: %v", err)
 	}
 
-	err = future.WaitForCompletion(ctx, clusterClient.Client)
-	if err != nil {
-		return c, fmt.Errorf("cannot get the aks cluster create or update future response: %v", err)
+	status = future.Status()
+	if status != "Creating" {
+		return "", fmt.Errorf("cannot create cluster: %v", status)
 	}
 
-	return future.Result(clusterClient)
+	return status, nil
 }
 
 // DeleteCluster deletes an existing aks cluster
@@ -112,9 +139,10 @@ func DeleteCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 		return result, fmt.Errorf("error deleting cluster: %v", err)
 	}
 
-	// FIXME: handle future correctly
-	// https://godoc.org/github.com/Azure/go-autorest/autorest/azure#Future
-	fmt.Println("FUTURE", future)
+	result = future.Status()
+	if result != "InProgress" {
+		return "", fmt.Errorf("current status of delete: %v", result)
+	}
 
 	msg := "Deleting " + resourceName + " cluster"
 

@@ -194,6 +194,8 @@ message CreateClusterAKSSpec {
     AzureClusterServiceAccount clusterAccount = 3;
     // Instance groups
     repeated AKSInstanceGroup instance_groups = 4;
+    // Tags
+    repeated Tags tags = 5;
 
     // Instance groups define a type and number of instances
     message AKSInstanceGroup {
@@ -205,6 +207,14 @@ message CreateClusterAKSSpec {
         int32 min_quantity = 3;
         // Maximum number of instances (defaults to zero)
         int32 max_quantity = 4;
+    }
+
+    // Tags are name/value pairs that enable you to categorize resources and view consolidated billing
+    message Tags {
+        // Tag key
+        string key = 1;
+        // Tag value
+        string value = 2;
     }
 }
 
