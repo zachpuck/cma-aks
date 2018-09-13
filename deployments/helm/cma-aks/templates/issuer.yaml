@@ -9,11 +9,12 @@ spec:
       providers:
       - name: route53
         route53:
-          accessKeyID: ""
-          hostedZoneID: ""
+          accessKeyID: {{ .Values.issuer.accesskey.id }}
+          hostedZoneID: {{ .Values.issuer.hostedzoneid }}
           region: {{ .Values.issuer.region }}
           secretAccessKeySecretRef:
-            key: ""
+            name: {{ .Values.name }}-route53-access-key-secret
+            key: secret-access-key
     email: {{ .Values.issuer.email }}
     privateKeySecretRef:
       key: ""

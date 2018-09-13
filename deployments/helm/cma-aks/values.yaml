@@ -5,7 +5,7 @@
 
 name: cma-aks
 image:
-  repo: quay.io/samsung_cnct/cma-aks:latest
+  repo: quay.io/samsung_cnct/cma-aks:prod
   pullPolicy: Always
 
 port: 80
@@ -20,5 +20,9 @@ ingress:
     name: cma-aks-grpc
     host: cma-aks-grpc.ontario.cluster.cnct.io
 issuer:
-  email: mvenezia@gmail.com
+  email: someone@cnct.io
   region: us-east-1
+  accesskey:
+    id: ""
+    secret: ""
+  hostedzoneid: ""
