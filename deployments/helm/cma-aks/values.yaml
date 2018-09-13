@@ -20,7 +20,7 @@ ingress:
     name: cma-aks-grpc
     host: cma-aks-grpc.ontario.cluster.cnct.io
 issuer:
-  email: mvenezia@gmail.com
+  email: someone@cnct.io
   region: us-east-1
   accesskey:
     id: ""
