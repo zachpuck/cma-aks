@@ -5,7 +5,7 @@
 
 name: cma-aks
 image:
-  repo: quay.io/samsung_cnct/cma-aks:latest
+  repo: quay.io/samsung_cnct/cma-aks:prod
   pullPolicy: Always
 
 port: 80
@@ -22,3 +22,7 @@ ingress:
 issuer:
   email: mvenezia@gmail.com
   region: us-east-1
+  accesskey:
+    id: ""
+    secret: ""
+  hostedzoneid: ""
