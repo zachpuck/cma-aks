@@ -56,16 +56,28 @@ func GetClusterClient(tenantID string, clientID string, clientSecret string, sub
 }
 
 // GetCluster retrieves a specific aks cluster
-func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (containerservice.ManagedCluster, error) {
+func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (c containerservice.ManagedCluster, kubeConfig string, err error) {
 	resourceGroupName := resourceName + "-group"
 
-	c, err := clusterClient.Get(ctx, resourceGroupName, resourceName)
+	// get kubeconfig for environment
+	credentialResults, err := clusterClient.ListClusterAdminCredentials(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		log.Printf("err getting cluster credentails: %v", err)
+	}
+	if credentialResults.Kubeconfigs != nil {
+		for _, v := range *credentialResults.Kubeconfigs {
+			if *v.Name == "clusterAdmin" {
+				kubeConfig = string(*v.Value)
+			}
+		}
+	}
+
+	c, err = clusterClient.Get(ctx, resourceGroupName, resourceName)
 	if err != nil {
 		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
-	} else {
-		fmt.Printf("Cluster %v status is %v\n", *c.Name, c.Status)
 	}
-	return c, err
+
+	return c, kubeConfig, err
 }
 
 // CreateCluster creates a new managed Kubernetes cluster
