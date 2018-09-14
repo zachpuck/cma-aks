@@ -75,18 +75,17 @@ func (s *Server) GetCluster(ctx context.Context, in *pb.GetClusterMsg) (*pb.GetC
 		return nil, fmt.Errorf("cannot get aks client: %v", err)
 	}
 
-	c, err := az.GetCluster(ctx, clusterClient, in.Name)
+	c, kubeConfig, err := az.GetCluster(ctx, clusterClient, in.Name)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.GetClusterReply{
 		Ok: true,
 		Cluster: &pb.ClusterDetailItem{
-			Id:     *c.ID,
-			Name:   *c.Name,
-			Status: c.Status,
-			// TODO: get kubeconfig?
-			Kubeconfig: "xyz",
+			Id:         *c.ID,
+			Name:       *c.Name,
+			Status:     *c.ProvisioningState,
+			Kubeconfig: kubeConfig,
 		},
 	}, nil
 }
