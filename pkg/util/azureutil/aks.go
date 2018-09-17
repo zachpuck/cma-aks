@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
@@ -36,21 +35,16 @@ type Agent struct {
 
 // GetClusterClient creates a new aks cluster client and authorizes access
 func GetClusterClient(tenantID string, clientID string, clientSecret string, subscriptionID string) (containerservice.ManagedClustersClient, error) {
-
-	// used to authenticate with azure
-	// sets the environment variables expected by NewAuthorizerFromEnvironment()
-	os.Setenv("AZURE_TENANT_ID", tenantID)
-	os.Setenv("AZURE_CLIENT_ID", clientID)
-	os.Setenv("AZURE_CLIENT_SECRET", clientSecret)
-
 	// create new cluster client in subscription
 	aksClient := containerservice.NewManagedClustersClient(subscriptionID)
 
-	// create an authorizer from env vars
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
+	// authorize request
+	clientConfig := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
+	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
-		log.Fatalf("failed to initialize authorizer: %v\n", err)
+		return aksClient, fmt.Errorf("failed to initialize authorizer: %v", err)
 	}
+
 	aksClient.Authorizer = authorizer
 	return aksClient, nil
 }
