@@ -166,3 +166,54 @@ func ListClusters(ctx context.Context, clusterClient containerservice.ManagedClu
 
 	return results.Values(), nil
 }
+
+// GetClusterUpgrades lists the kubernetes upgrades available on the cluster
+func GetClusterUpgrades(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) ([]string, error) {
+	resourceGroupName := resourceName + "-group"
+
+	result, err := clusterClient.GetUpgradeProfile(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		return nil, fmt.Errorf("error getting available upgrades: %v", err)
+	}
+
+	for _, v := range *result.AgentPoolProfiles {
+		if v.Upgrades != nil {
+			return *v.Upgrades, nil
+		}
+	}
+
+	return nil, nil
+}
+
+// UpgradeCluster upgrades the cluster to the provided kubernetes version
+func UpgradeCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (status string, err error) {
+	resourceGroupName := parameters.Name + "-group"
+
+	// Get the location from cluster properties
+	c, err := clusterClient.Get(ctx, resourceGroupName, parameters.Name)
+	if err != nil {
+		fmt.Printf("Error getting location for cluster %v: %v\n", parameters.Name, err)
+	}
+
+	future, err := clusterClient.CreateOrUpdate(
+		ctx,
+		resourceGroupName,
+		parameters.Name,
+		containerservice.ManagedCluster{
+			Location: c.Location,
+			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
+				KubernetesVersion: &parameters.KubernetesVersion,
+			},
+		},
+	)
+	if err != nil {
+		return "", fmt.Errorf("cannot upgrade cluster: %v", err)
+	}
+
+	status = future.Status()
+	if status != "Upgrading" {
+		return "", fmt.Errorf("cannot upgrade cluster: %v", status)
+	}
+
+	return status, nil
+}

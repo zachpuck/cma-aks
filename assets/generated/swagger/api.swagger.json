@@ -198,6 +198,85 @@
         ]
       }
     },
+    "/api/v1/cluster/upgrade": {
+      "get": {
+        "summary": "Will retrieve available upgrades of a cluster",
+        "operationId": "GetClusterUpgrades",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksGetClusterUpgradesReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "Name of the cluster to be looked up.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.app_id",
+            "description": "The AppId for API Access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.tenant",
+            "description": "The Tenant for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.password",
+            "description": "The Password for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.subscription_id",
+            "description": "The Subscription for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
+      },
+      "put": {
+        "summary": "Will upgrade a cluster",
+        "operationId": "UpgradeCluster",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksUpgradeClusterReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cmaaksUpgradeClusterMsg"
+            }
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
+      }
+    },
     "/api/v1/version": {
       "get": {
         "summary": "Will return version information about api server",
@@ -490,6 +569,24 @@
         }
       }
     },
+    "cmaaksGetClusterUpgradesReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Is the cluster in the system"
+        },
+        "upgrades": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cmaaksUpgrade"
+          },
+          "title": "The available upgrades"
+        }
+      },
+      "title": "Reply with available upgrades"
+    },
     "cmaaksGetVersionReply": {
       "type": "object",
       "properties": {
@@ -504,6 +601,68 @@
         }
       },
       "title": "Reply for version request"
+    },
+    "cmaaksUpgrade": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      },
+      "title": "available upgrade version"
+    },
+    "cmaaksUpgradeClusterAKSSpec": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "$ref": "#/definitions/cmaaksAzureCredentials",
+          "title": "Credentials to build the cluster"
+        }
+      }
+    },
+    "cmaaksUpgradeClusterMsg": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the cluster to be upgraded"
+        },
+        "provider": {
+          "$ref": "#/definitions/cmaaksUpgradeClusterProviderSpec",
+          "title": "The provider specification"
+        }
+      }
+    },
+    "cmaaksUpgradeClusterProviderSpec": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "What is the provider - like aks"
+        },
+        "k8s_version": {
+          "type": "string",
+          "title": "The version of Kubernetes"
+        },
+        "azure": {
+          "$ref": "#/definitions/cmaaksUpgradeClusterAKSSpec",
+          "title": "The AKS specification"
+        }
+      }
+    },
+    "cmaaksUpgradeClusterReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Whether or not the cluster was upgrade by this request"
+        },
+        "cluster": {
+          "$ref": "#/definitions/cmaaksClusterItem",
+          "title": "The details of the cluster request response"
+        }
+      }
     }
   },
   "externalDocs": {

@@ -74,6 +74,19 @@ service Cluster {
             get : "/api/v1/version"
         };
     }
+    // Will retrieve available upgrades of a cluster
+    rpc GetClusterUpgrades (GetClusterUpgradesMsg) returns (GetClusterUpgradesReply) {
+        option (google.api.http) = {
+            get : "/api/v1/cluster/upgrade"
+        };
+    }
+    // Will upgrade a cluster
+    rpc UpgradeCluster (UpgradeClusterMsg) returns (UpgradeClusterReply) {
+        option (google.api.http) = {
+            put : "/api/v1/cluster/upgrade"
+            body : "*"
+        };
+    }
 }
 
 message CreateClusterMsg {
@@ -248,4 +261,52 @@ message GetVersionReply {
     VersionInformation version_information = 2;
 }
 
+// Get available cluster upgrades
+message GetClusterUpgradesMsg {
+    // Name of the cluster to be looked up
+    string name = 1;
+    // Credentials to query for the cluster
+    AzureCredentials credentials = 2;
+}
 
+// Reply with available upgrades
+message GetClusterUpgradesReply {
+    // Is the cluster in the system
+    bool ok = 1;
+
+    // The available upgrades
+    repeated Upgrade upgrades = 2;
+}
+
+// available upgrade version
+message Upgrade {
+    string version = 1;
+}
+
+message UpgradeClusterMsg {
+    // Name of the cluster to be upgraded
+    string name = 1;
+    // The provider specification
+    UpgradeClusterProviderSpec provider = 2;
+}
+
+message UpgradeClusterReply {
+    // Whether or not the cluster was upgrade by this request
+    bool ok = 1;
+    // The details of the cluster request response
+    ClusterItem cluster = 2;
+}
+
+message UpgradeClusterProviderSpec {
+    // What is the provider - like aks
+    string name = 1;
+    // The version of Kubernetes
+    string k8s_version = 2;
+
+    // The AKS specification
+    UpgradeClusterAKSSpec azure = 3;
+}
+message UpgradeClusterAKSSpec {
+    // Credentials to build the cluster
+    AzureCredentials credentials = 1;
+}
