@@ -250,6 +250,31 @@
         "tags": [
           "Cluster"
         ]
+      },
+      "put": {
+        "summary": "Will upgrade a cluster",
+        "operationId": "UpgradeCluster",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksUpgradeClusterReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cmaaksUpgradeClusterMsg"
+            }
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
       }
     },
     "/api/v1/version": {
@@ -584,7 +609,60 @@
           "type": "string"
         }
       },
-      "title": "upgrade version"
+      "title": "available upgrade version"
+    },
+    "cmaaksUpgradeClusterAKSSpec": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "$ref": "#/definitions/cmaaksAzureCredentials",
+          "title": "Credentials to build the cluster"
+        }
+      }
+    },
+    "cmaaksUpgradeClusterMsg": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the cluster to be upgraded"
+        },
+        "provider": {
+          "$ref": "#/definitions/cmaaksUpgradeClusterProviderSpec",
+          "title": "The provider specification"
+        }
+      }
+    },
+    "cmaaksUpgradeClusterProviderSpec": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "What is the provider - like aks"
+        },
+        "k8s_version": {
+          "type": "string",
+          "title": "The version of Kubernetes"
+        },
+        "azure": {
+          "$ref": "#/definitions/cmaaksUpgradeClusterAKSSpec",
+          "title": "The AKS specification"
+        }
+      }
+    },
+    "cmaaksUpgradeClusterReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Whether or not the cluster was upgrade by this request"
+        },
+        "cluster": {
+          "$ref": "#/definitions/cmaaksClusterItem",
+          "title": "The details of the cluster request response"
+        }
+      }
     }
   },
   "externalDocs": {

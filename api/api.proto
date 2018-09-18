@@ -80,6 +80,13 @@ service Cluster {
             get : "/api/v1/cluster/upgrade"
         };
     }
+    // Will upgrade a cluster
+    rpc UpgradeCluster (UpgradeClusterMsg) returns (UpgradeClusterReply) {
+        option (google.api.http) = {
+            put : "/api/v1/cluster/upgrade"
+            body : "*"
+        };
+    }
 }
 
 message CreateClusterMsg {
@@ -271,7 +278,35 @@ message GetClusterUpgradesReply {
     repeated Upgrade upgrades = 2;
 }
 
-// upgrade version
+// available upgrade version
 message Upgrade {
     string version = 1;
+}
+
+message UpgradeClusterMsg {
+    // Name of the cluster to be upgraded
+    string name = 1;
+    // The provider specification
+    UpgradeClusterProviderSpec provider = 2;
+}
+
+message UpgradeClusterReply {
+    // Whether or not the cluster was upgrade by this request
+    bool ok = 1;
+    // The details of the cluster request response
+    ClusterItem cluster = 2;
+}
+
+message UpgradeClusterProviderSpec {
+    // What is the provider - like aks
+    string name = 1;
+    // The version of Kubernetes
+    string k8s_version = 2;
+
+    // The AKS specification
+    UpgradeClusterAKSSpec azure = 3;
+}
+message UpgradeClusterAKSSpec {
+    // Credentials to build the cluster
+    AzureCredentials credentials = 1;
 }

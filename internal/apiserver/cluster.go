@@ -160,3 +160,34 @@ func (s *Server) GetClusterUpgrades(ctx context.Context, in *pb.GetClusterUpgrad
 		Upgrades: upgrades,
 	}, nil
 }
+
+func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (*pb.UpgradeClusterReply, error) {
+
+	// get cluster client
+	clusterClient, err := az.GetClusterClient(in.Provider.Azure.Credentials.Tenant, in.Provider.Azure.Credentials.AppId, in.Provider.Azure.Credentials.Password, in.Provider.Azure.Credentials.SubscriptionId)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get aks client: %v", err)
+	}
+
+	// set parameters to upgrade cluster
+	var parameters az.ClusterParameters
+	parameters.Name = in.Name
+	parameters.KubernetesVersion = in.Provider.K8SVersion
+
+	// upgrade cluster
+	status, err := az.UpgradeCluster(ctx, clusterClient, parameters)
+	if err != nil {
+		return nil, fmt.Errorf("error upgrading cluster: %v", err)
+	}
+
+	clusterID := "/subscriptions/" + in.Provider.Azure.Credentials.SubscriptionId + "/resourcegroups/" + parameters.Name + "-group/providers/Microsoft.ContainerService/managedClusters/" + parameters.Name
+
+	return &pb.UpgradeClusterReply{
+		Ok: true,
+		Cluster: &pb.ClusterItem{
+			Id:     clusterID,
+			Name:   parameters.Name,
+			Status: status,
+		},
+	}, nil
+}

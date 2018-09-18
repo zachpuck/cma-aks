@@ -26,6 +26,10 @@
     - [GetVersionReply](#cmaaks.GetVersionReply)
     - [GetVersionReply.VersionInformation](#cmaaks.GetVersionReply.VersionInformation)
     - [Upgrade](#cmaaks.Upgrade)
+    - [UpgradeClusterAKSSpec](#cmaaks.UpgradeClusterAKSSpec)
+    - [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg)
+    - [UpgradeClusterProviderSpec](#cmaaks.UpgradeClusterProviderSpec)
+    - [UpgradeClusterReply](#cmaaks.UpgradeClusterReply)
   
   
   
@@ -55,6 +59,10 @@
     - [GetVersionReply](#cmaaks.GetVersionReply)
     - [GetVersionReply.VersionInformation](#cmaaks.GetVersionReply.VersionInformation)
     - [Upgrade](#cmaaks.Upgrade)
+    - [UpgradeClusterAKSSpec](#cmaaks.UpgradeClusterAKSSpec)
+    - [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg)
+    - [UpgradeClusterProviderSpec](#cmaaks.UpgradeClusterProviderSpec)
+    - [UpgradeClusterReply](#cmaaks.UpgradeClusterReply)
   
   
   
@@ -422,12 +430,76 @@ Reply for version request
 <a name="cmaaks.Upgrade"></a>
 
 ### Upgrade
-upgrade version
+available upgrade version
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | version | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterAKSSpec"></a>
+
+### UpgradeClusterAKSSpec
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to build the cluster |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterMsg"></a>
+
+### UpgradeClusterMsg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of the cluster to be upgraded |
+| provider | [UpgradeClusterProviderSpec](#cmaaks.UpgradeClusterProviderSpec) |  | The provider specification |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterProviderSpec"></a>
+
+### UpgradeClusterProviderSpec
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | What is the provider - like aks |
+| k8s_version | [string](#string) |  | The version of Kubernetes |
+| azure | [UpgradeClusterAKSSpec](#cmaaks.UpgradeClusterAKSSpec) |  | The AKS specification |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterReply"></a>
+
+### UpgradeClusterReply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | Whether or not the cluster was upgrade by this request |
+| cluster | [ClusterItem](#cmaaks.ClusterItem) |  | The details of the cluster request response |
 
 
 
@@ -453,6 +525,7 @@ upgrade version
 | GetClusterList | [GetClusterListMsg](#cmaaks.GetClusterListMsg) | [GetClusterListReply](#cmaaks.GetClusterListReply) | Will retrieve a list of clusters |
 | GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionReply) | Will return version information about api server |
 | GetClusterUpgrades | [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg) | [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply) | Will retrieve available upgrades of a cluster |
+| UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
 
  
 
@@ -815,12 +888,76 @@ Reply for version request
 <a name="cmaaks.Upgrade"></a>
 
 ### Upgrade
-upgrade version
+available upgrade version
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | version | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterAKSSpec"></a>
+
+### UpgradeClusterAKSSpec
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to build the cluster |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterMsg"></a>
+
+### UpgradeClusterMsg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of the cluster to be upgraded |
+| provider | [UpgradeClusterProviderSpec](#cmaaks.UpgradeClusterProviderSpec) |  | The provider specification |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterProviderSpec"></a>
+
+### UpgradeClusterProviderSpec
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | What is the provider - like aks |
+| k8s_version | [string](#string) |  | The version of Kubernetes |
+| azure | [UpgradeClusterAKSSpec](#cmaaks.UpgradeClusterAKSSpec) |  | The AKS specification |
+
+
+
+
+
+
+<a name="cmaaks.UpgradeClusterReply"></a>
+
+### UpgradeClusterReply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | Whether or not the cluster was upgrade by this request |
+| cluster | [ClusterItem](#cmaaks.ClusterItem) |  | The details of the cluster request response |
 
 
 
@@ -846,6 +983,7 @@ upgrade version
 | GetClusterList | [GetClusterListMsg](#cmaaks.GetClusterListMsg) | [GetClusterListReply](#cmaaks.GetClusterListReply) | Will retrieve a list of clusters |
 | GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionReply) | Will return version information about api server |
 | GetClusterUpgrades | [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg) | [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply) | Will retrieve available upgrades of a cluster |
+| UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
 
  
 
