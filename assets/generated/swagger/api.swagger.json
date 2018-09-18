@@ -198,6 +198,60 @@
         ]
       }
     },
+    "/api/v1/cluster/upgrade": {
+      "get": {
+        "summary": "Will retrieve available upgrades of a cluster",
+        "operationId": "GetClusterUpgrades",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksGetClusterUpgradesReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "Name of the cluster to be looked up.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.app_id",
+            "description": "The AppId for API Access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.tenant",
+            "description": "The Tenant for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.password",
+            "description": "The Password for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.subscription_id",
+            "description": "The Subscription for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
+      }
+    },
     "/api/v1/version": {
       "get": {
         "summary": "Will return version information about api server",
@@ -490,6 +544,24 @@
         }
       }
     },
+    "cmaaksGetClusterUpgradesReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Is the cluster in the system"
+        },
+        "upgrades": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cmaaksUpgrade"
+          },
+          "title": "The available upgrades"
+        }
+      },
+      "title": "Reply with available upgrades"
+    },
     "cmaaksGetVersionReply": {
       "type": "object",
       "properties": {
@@ -504,6 +576,15 @@
         }
       },
       "title": "Reply for version request"
+    },
+    "cmaaksUpgrade": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        }
+      },
+      "title": "upgrade version"
     }
   },
   "externalDocs": {

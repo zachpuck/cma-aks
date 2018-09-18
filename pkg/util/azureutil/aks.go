@@ -166,3 +166,21 @@ func ListClusters(ctx context.Context, clusterClient containerservice.ManagedClu
 
 	return results.Values(), nil
 }
+
+// GetClusterUpgrades lists the kubernetes upgrades available on the cluster
+func GetClusterUpgrades(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) ([]string, error) {
+	resourceGroupName := resourceName + "-group"
+
+	result, err := clusterClient.GetUpgradeProfile(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		return nil, fmt.Errorf("error getting available upgrades: %v", err)
+	}
+
+	for _, v := range *result.AgentPoolProfiles {
+		if v.Upgrades != nil {
+			return *v.Upgrades, nil
+		}
+	}
+
+	return nil, nil
+}

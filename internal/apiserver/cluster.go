@@ -133,3 +133,30 @@ func (s *Server) GetClusterList(ctx context.Context, in *pb.GetClusterListMsg) (
 	}
 	return reply, nil
 }
+
+func (s *Server) GetClusterUpgrades(ctx context.Context, in *pb.GetClusterUpgradesMsg) (reply *pb.GetClusterUpgradesReply, err error) {
+
+	clusterClient, err := az.GetClusterClient(in.Credentials.Tenant, in.Credentials.AppId, in.Credentials.Password, in.Credentials.SubscriptionId)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get aks client: %v", err)
+	}
+
+	result, err := az.GetClusterUpgrades(ctx, clusterClient, in.Name)
+	if err != nil {
+		return nil, fmt.Errorf("cannot retrieve available upgrades: %v", err)
+	}
+
+	// create slice of available upgrades
+	var upgrades []*pb.Upgrade
+	for i := range result {
+		upgrade := pb.Upgrade{
+			Version: result[i],
+		}
+		upgrades = append(upgrades, &upgrade)
+	}
+
+	return &pb.GetClusterUpgradesReply{
+		Ok:       true,
+		Upgrades: upgrades,
+	}, nil
+}

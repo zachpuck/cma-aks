@@ -74,6 +74,12 @@ service Cluster {
             get : "/api/v1/version"
         };
     }
+    // Will retrieve available upgrades of a cluster
+    rpc GetClusterUpgrades (GetClusterUpgradesMsg) returns (GetClusterUpgradesReply) {
+        option (google.api.http) = {
+            get : "/api/v1/cluster/upgrade"
+        };
+    }
 }
 
 message CreateClusterMsg {
@@ -248,4 +254,24 @@ message GetVersionReply {
     VersionInformation version_information = 2;
 }
 
+// Get available cluster upgrades
+message GetClusterUpgradesMsg {
+    // Name of the cluster to be looked up
+    string name = 1;
+    // Credentials to query for the cluster
+    AzureCredentials credentials = 2;
+}
 
+// Reply with available upgrades
+message GetClusterUpgradesReply {
+    // Is the cluster in the system
+    bool ok = 1;
+
+    // The available upgrades
+    repeated Upgrade upgrades = 2;
+}
+
+// upgrade version
+message Upgrade {
+    string version = 1;
+}
