@@ -311,11 +311,6 @@
           "type": "integer",
           "format": "int32",
           "title": "Minimum number of instances (defaults to zero)"
-        },
-        "max_quantity": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Maximum number of instances (defaults to zero)"
         }
       },
       "title": "Instance groups define a type and number of instances"

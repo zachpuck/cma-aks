@@ -218,8 +218,6 @@ message CreateClusterAKSSpec {
         string type = 2;
         // Minimum number of instances (defaults to zero)
         int32 min_quantity = 3;
-        // Maximum number of instances (defaults to zero)
-        int32 max_quantity = 4;
     }
 
     // Tags are name/value pairs that enable you to categorize resources and view consolidated billing

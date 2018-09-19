@@ -179,7 +179,6 @@ Instance groups define a type and number of instances
 | name | [string](#string) |  | The name of the group |
 | type | [string](#string) |  | Instance type (Standard_D2_v2, etc.) |
 | min_quantity | [int32](#int32) |  | Minimum number of instances (defaults to zero) |
-| max_quantity | [int32](#int32) |  | Maximum number of instances (defaults to zero) |
 
 
 
@@ -637,7 +636,6 @@ Instance groups define a type and number of instances
 | name | [string](#string) |  | The name of the group |
 | type | [string](#string) |  | Instance type (Standard_D2_v2, etc.) |
 | min_quantity | [int32](#int32) |  | Minimum number of instances (defaults to zero) |
-| max_quantity | [int32](#int32) |  | Maximum number of instances (defaults to zero) |
 
 
 
