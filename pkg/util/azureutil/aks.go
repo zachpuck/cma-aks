@@ -194,6 +194,11 @@ func UpgradeCluster(ctx context.Context, clusterClient containerservice.ManagedC
 		fmt.Printf("Error getting location for cluster %v: %v\n", parameters.Name, err)
 	}
 
+	// check cluster status before upgrading
+	if *c.ProvisioningState != "Succeeded" {
+		return "", fmt.Errorf("Unable to upgrade cluster while it is currently %v", *c.ProvisioningState) 
+	}
+ 
 	future, err := clusterClient.CreateOrUpdate(
 		ctx,
 		resourceGroupName,
