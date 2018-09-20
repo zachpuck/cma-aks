@@ -40,7 +40,6 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	for i := range in.Provider.Azure.InstanceGroups {
 		parameters.AgentPools[i].Name = &in.Provider.Azure.InstanceGroups[i].Name
 		parameters.AgentPools[i].Count = &in.Provider.Azure.InstanceGroups[i].MinQuantity
-		parameters.AgentPools[i].MaxPods = &in.Provider.Azure.InstanceGroups[i].MaxQuantity
 		parameters.AgentPools[i].Type = in.Provider.Azure.InstanceGroups[i].Type
 	}
 

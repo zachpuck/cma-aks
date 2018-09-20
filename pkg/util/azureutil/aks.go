@@ -100,7 +100,6 @@ func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 		agentPoolProfiles[i] = containerservice.ManagedClusterAgentPoolProfile{
 			Name:    parameters.AgentPools[i].Name,
 			Count:   parameters.AgentPools[i].Count,
-			MaxPods: parameters.AgentPools[i].MaxPods,
 			VMSize:  vmSize,
 		}
 	}
