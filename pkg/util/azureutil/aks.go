@@ -221,3 +221,20 @@ func UpgradeCluster(ctx context.Context, clusterClient containerservice.ManagedC
 
 	return status, nil
 }
+
+// GetClusterNodeCount returns the current number of nodes in the agent pool
+func GetClusterNodeCount(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (agent Agent, err error) {
+	resourceGroupName := resourceName + "-group"
+
+	c, err := clusterClient.Get(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
+	}
+
+	temp := c.ManagedClusterProperties.AgentPoolProfiles
+	for _, v := range *temp {
+		agent.Name = v.Name
+		agent.Count = v.Count
+	}
+	return agent, nil
+}

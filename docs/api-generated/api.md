@@ -19,6 +19,8 @@
     - [GetClusterListMsg](#cmaaks.GetClusterListMsg)
     - [GetClusterListReply](#cmaaks.GetClusterListReply)
     - [GetClusterMsg](#cmaaks.GetClusterMsg)
+    - [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg)
+    - [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply)
     - [GetClusterReply](#cmaaks.GetClusterReply)
     - [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg)
     - [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply)
@@ -52,6 +54,8 @@
     - [GetClusterListMsg](#cmaaks.GetClusterListMsg)
     - [GetClusterListReply](#cmaaks.GetClusterListReply)
     - [GetClusterMsg](#cmaaks.GetClusterMsg)
+    - [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg)
+    - [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply)
     - [GetClusterReply](#cmaaks.GetClusterReply)
     - [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg)
     - [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply)
@@ -331,6 +335,39 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 
 
 
+<a name="cmaaks.GetClusterNodeCountMsg"></a>
+
+### GetClusterNodeCountMsg
+Get available node count
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of the cluster to be looked up |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to query for the cluster |
+
+
+
+
+
+
+<a name="cmaaks.GetClusterNodeCountReply"></a>
+
+### GetClusterNodeCountReply
+Reply with available node count
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | Is the cluster in the system |
+| name | [string](#string) |  | the available node pool name |
+| count | [int32](#int32) |  | The available node count |
+
+
+
+
+
+
 <a name="cmaaks.GetClusterReply"></a>
 
 ### GetClusterReply
@@ -525,6 +562,7 @@ available upgrade version
 | GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionReply) | Will return version information about api server |
 | GetClusterUpgrades | [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg) | [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply) | Will retrieve available upgrades of a cluster |
 | UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
+| GetClusterNodeCount | [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg) | [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply) | Will retrieve node count |
 
  
 
@@ -788,6 +826,39 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 
 
 
+<a name="cmaaks.GetClusterNodeCountMsg"></a>
+
+### GetClusterNodeCountMsg
+Get available node count
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of the cluster to be looked up |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to query for the cluster |
+
+
+
+
+
+
+<a name="cmaaks.GetClusterNodeCountReply"></a>
+
+### GetClusterNodeCountReply
+Reply with available node count
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | Is the cluster in the system |
+| name | [string](#string) |  | the available node pool name |
+| count | [int32](#int32) |  | The available node count |
+
+
+
+
+
+
 <a name="cmaaks.GetClusterReply"></a>
 
 ### GetClusterReply
@@ -982,6 +1053,7 @@ available upgrade version
 | GetVersionInformation | [GetVersionMsg](#cmaaks.GetVersionMsg) | [GetVersionReply](#cmaaks.GetVersionReply) | Will return version information about api server |
 | GetClusterUpgrades | [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg) | [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply) | Will retrieve available upgrades of a cluster |
 | UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
+| GetClusterNodeCount | [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg) | [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply) | Will retrieve node count |
 
  
 

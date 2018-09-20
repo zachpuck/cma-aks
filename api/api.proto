@@ -87,6 +87,12 @@ service Cluster {
             body : "*"
         };
     }
+    // Will retrieve node count
+    rpc GetClusterNodeCount (GetClusterNodeCountMsg) returns (GetClusterNodeCountReply) {
+        option (google.api.http) = {
+            get : "/api/v1/cluster/scale"
+        };
+    }
 }
 
 message CreateClusterMsg {
@@ -307,4 +313,22 @@ message UpgradeClusterProviderSpec {
 message UpgradeClusterAKSSpec {
     // Credentials to build the cluster
     AzureCredentials credentials = 1;
+}
+
+// Get available node count
+message GetClusterNodeCountMsg {
+    // Name of the cluster to be looked up
+    string name = 1;
+    // Credentials to query for the cluster
+    AzureCredentials credentials = 2;
+}
+
+// Reply with available node count
+message GetClusterNodeCountReply {
+    // Is the cluster in the system
+    bool ok = 1;
+    // the available node pool name
+    string name = 2;
+    // The available node count
+    int32 count = 3;
 }
