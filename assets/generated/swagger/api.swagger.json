@@ -250,6 +250,31 @@
         "tags": [
           "Cluster"
         ]
+      },
+      "put": {
+        "summary": "Will scale a clusters node count",
+        "operationId": "ScaleCluster",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksScaleClusterReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cmaaksScaleClusterMsg"
+            }
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
       }
     },
     "/api/v1/cluster/upgrade": {
@@ -670,6 +695,42 @@
         }
       },
       "title": "Reply for version request"
+    },
+    "cmaaksScaleClusterMsg": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of cluster"
+        },
+        "credentials": {
+          "$ref": "#/definitions/cmaaksAzureCredentials",
+          "title": "Credentials to search subscription for clusters"
+        },
+        "node_pool": {
+          "type": "string",
+          "title": "name of node pool"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "total desired nodes"
+        }
+      }
+    },
+    "cmaaksScaleClusterReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "wheather or not the cluster was scaled"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of the request"
+        }
+      }
     },
     "cmaaksUpgrade": {
       "type": "object",

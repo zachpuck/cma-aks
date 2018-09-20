@@ -27,6 +27,8 @@
     - [GetVersionMsg](#cmaaks.GetVersionMsg)
     - [GetVersionReply](#cmaaks.GetVersionReply)
     - [GetVersionReply.VersionInformation](#cmaaks.GetVersionReply.VersionInformation)
+    - [ScaleClusterMsg](#cmaaks.ScaleClusterMsg)
+    - [ScaleClusterReply](#cmaaks.ScaleClusterReply)
     - [Upgrade](#cmaaks.Upgrade)
     - [UpgradeClusterAKSSpec](#cmaaks.UpgradeClusterAKSSpec)
     - [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg)
@@ -62,6 +64,8 @@
     - [GetVersionMsg](#cmaaks.GetVersionMsg)
     - [GetVersionReply](#cmaaks.GetVersionReply)
     - [GetVersionReply.VersionInformation](#cmaaks.GetVersionReply.VersionInformation)
+    - [ScaleClusterMsg](#cmaaks.ScaleClusterMsg)
+    - [ScaleClusterReply](#cmaaks.ScaleClusterReply)
     - [Upgrade](#cmaaks.Upgrade)
     - [UpgradeClusterAKSSpec](#cmaaks.UpgradeClusterAKSSpec)
     - [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg)
@@ -463,6 +467,40 @@ Reply for version request
 
 
 
+<a name="cmaaks.ScaleClusterMsg"></a>
+
+### ScaleClusterMsg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of cluster |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to search subscription for clusters |
+| node_pool | [string](#string) |  | name of node pool |
+| count | [int32](#int32) |  | total desired nodes |
+
+
+
+
+
+
+<a name="cmaaks.ScaleClusterReply"></a>
+
+### ScaleClusterReply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | wheather or not the cluster was scaled |
+| status | [string](#string) |  | Status of the request |
+
+
+
+
+
+
 <a name="cmaaks.Upgrade"></a>
 
 ### Upgrade
@@ -563,6 +601,7 @@ available upgrade version
 | GetClusterUpgrades | [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg) | [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply) | Will retrieve available upgrades of a cluster |
 | UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
 | GetClusterNodeCount | [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg) | [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply) | Will retrieve node count |
+| ScaleCluster | [ScaleClusterMsg](#cmaaks.ScaleClusterMsg) | [ScaleClusterReply](#cmaaks.ScaleClusterReply) | Will scale a clusters node count |
 
  
 
@@ -954,6 +993,40 @@ Reply for version request
 
 
 
+<a name="cmaaks.ScaleClusterMsg"></a>
+
+### ScaleClusterMsg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of cluster |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to search subscription for clusters |
+| node_pool | [string](#string) |  | name of node pool |
+| count | [int32](#int32) |  | total desired nodes |
+
+
+
+
+
+
+<a name="cmaaks.ScaleClusterReply"></a>
+
+### ScaleClusterReply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | wheather or not the cluster was scaled |
+| status | [string](#string) |  | Status of the request |
+
+
+
+
+
+
 <a name="cmaaks.Upgrade"></a>
 
 ### Upgrade
@@ -1054,6 +1127,7 @@ available upgrade version
 | GetClusterUpgrades | [GetClusterUpgradesMsg](#cmaaks.GetClusterUpgradesMsg) | [GetClusterUpgradesReply](#cmaaks.GetClusterUpgradesReply) | Will retrieve available upgrades of a cluster |
 | UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
 | GetClusterNodeCount | [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg) | [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply) | Will retrieve node count |
+| ScaleCluster | [ScaleClusterMsg](#cmaaks.ScaleClusterMsg) | [ScaleClusterReply](#cmaaks.ScaleClusterReply) | Will scale a clusters node count |
 
  
 

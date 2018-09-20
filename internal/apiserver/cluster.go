@@ -192,7 +192,7 @@ func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (
 }
 
 func (s *Server) GetClusterNodeCount(ctx context.Context, in *pb.GetClusterNodeCountMsg) (reply *pb.GetClusterNodeCountReply, err error) {
-	
+
 	clusterClient, err := az.GetClusterClient(in.Credentials.Tenant, in.Credentials.AppId, in.Credentials.Password, in.Credentials.SubscriptionId)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get aks client: %v", err)
@@ -207,5 +207,24 @@ func (s *Server) GetClusterNodeCount(ctx context.Context, in *pb.GetClusterNodeC
 		Ok:    true,
 		Name:  *result.Name,
 		Count: *result.Count,
+	}, nil
+}
+
+func (s *Server) ScaleCluster(ctx context.Context, in *pb.ScaleClusterMsg) (reply *pb.ScaleClusterReply, err error) {
+
+	// get cluster client
+	clusterClient, err := az.GetClusterClient(in.Credentials.Tenant, in.Credentials.AppId, in.Credentials.Password, in.Credentials.SubscriptionId)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get aks client: %v", err)
+	}
+
+	result, err := az.ScaleClusterNodeCount(ctx, clusterClient, in.Name, in.NodePool, in.Count)
+	if err != nil {
+		return nil, fmt.Errorf("error scaling cluster: %v", err)
+	}
+
+	return &pb.ScaleClusterReply{
+		Ok:     true,
+		Status: result,
 	}, nil
 }
