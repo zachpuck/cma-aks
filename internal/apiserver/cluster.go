@@ -20,7 +20,38 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 		}
 	}
 
-	// create cluster
+	// TODO: generate clientID and Secret
+
+	// generate ClusterAccount
+	appClient, err := az.GetApplicationsClient(in.Provider.Azure.Credentials.Tenant, in.Provider.Azure.Credentials.AppId, in.Provider.Azure.Credentials.Password)
+	if err != nil {
+		return nil, fmt.Errorf("error getting application client for cluster account: %v", err)
+	}
+
+	// create application
+	adApp, err := az.CreateADApplication(ctx, appClient, in.Name)
+	if err != nil {
+		return nil, fmt.Errorf("error creating ad application for cluster account: %v", err)
+	}
+
+	// create service principal client
+	spClient, err := az.GetServicePrincipalsClient(in.Provider.Azure.Credentials.Tenant, in.Provider.Azure.Credentials.AppId, in.Provider.Azure.Credentials.Password)
+	if err != nil {
+		return nil, fmt.Errorf("error getting service principal client for cluster account: %v", err)
+	}
+	// create service principal
+	sp, err := az.CreateServicePrincipal(ctx, spClient, *adApp.AppID)
+	if err != nil {
+		return nil, fmt.Errorf("err creating service principal for cluster account: %v", err)
+	}
+	// create cluster account
+	clusterAccount, err := az.AddClientSecret(ctx, appClient, *sp.AppID)
+	if err != nil {
+		return nil, fmt.Errorf("err creating client secret for cluster account: %v", err)
+	}
+	fmt.Println(clusterAccount.ClientID, clusterAccount.ClientSecret)
+
+	// create cluster client
 	clusterClient, err := az.GetClusterClient(in.Provider.Azure.Credentials.Tenant, in.Provider.Azure.Credentials.AppId, in.Provider.Azure.Credentials.Password, in.Provider.Azure.Credentials.SubscriptionId)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get aks client: %v", err)
@@ -32,8 +63,8 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	parameters.Name = in.Name
 	parameters.Location = in.Provider.Azure.Location
 	parameters.KubernetesVersion = in.Provider.K8SVersion
-	parameters.ClientID = in.Provider.Azure.ClusterAccount.ClientId
-	parameters.ClientSecret = in.Provider.Azure.ClusterAccount.ClientSecret
+	// parameters.ClientID = clusterAccount.ClientID
+	// parameters.ClientSecret = clusterAccount.ClientSecret
 
 	// sets up each instance group agent
 	parameters.AgentPools = make([]az.Agent, len(in.Provider.Azure.InstanceGroups))

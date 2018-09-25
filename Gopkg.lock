@@ -2,10 +2,11 @@
 
 
 [[projects]]
-  digest = "1:5a5ac3f913fb4ba3507aac6123eac0460422641b4b7fce44a9c02569759a075e"
+  digest = "1:76ddfde56df7b6f733d488f56e0a124b3228eb825b0cbfab530fafc8c2a0ea5b"
   name = "github.com/Azure/azure-sdk-for-go"
   packages = [
     "services/containerservice/mgmt/2018-03-31/containerservice",
+    "services/graphrbac/1.6/graphrbac",
     "services/resources/mgmt/2018-05-01/resources",
     "version",
   ]
@@ -644,6 +645,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2018-03-31/containerservice",
+    "github.com/Azure/azure-sdk-for-go/services/graphrbac/1.6/graphrbac",
     "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2018-05-01/resources",
     "github.com/Azure/go-autorest/autorest/azure/auth",
     "github.com/Azure/go-autorest/autorest/to",
