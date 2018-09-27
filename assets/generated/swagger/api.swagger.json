@@ -151,6 +151,33 @@
         ]
       }
     },
+    "/api/v1/cluster/autoscaling": {
+      "put": {
+        "summary": "Will enable cluster autoscaling",
+        "operationId": "EnableClusterAutoscaling",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksEnableClusterAutoscalingReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cmaaksEnableClusterAutoscalingMsg"
+            }
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
+      }
+    },
     "/api/v1/cluster/list": {
       "get": {
         "summary": "Will retrieve a list of clusters",
@@ -610,6 +637,39 @@
         "status": {
           "type": "string",
           "title": "Status of the request"
+        }
+      }
+    },
+    "cmaaksEnableClusterAutoscalingMsg": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of the cluster"
+        },
+        "min_quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Minimum number of nodes for autoscaling"
+        },
+        "max_quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Maximum number of nodes for autoscaling"
+        },
+        "credentials": {
+          "$ref": "#/definitions/cmaaksAzureCredentials",
+          "title": "Credentials to access the cluster"
+        }
+      }
+    },
+    "cmaaksEnableClusterAutoscalingReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Whether or not cluster autoscaling was enabled by this request"
         }
       }
     },

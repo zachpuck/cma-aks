@@ -5,6 +5,8 @@ import (
 	pb "github.com/samsung-cnct/cma-aks/pkg/generated/api"
 	az "github.com/samsung-cnct/cma-aks/pkg/util/azureutil"
 	"golang.org/x/net/context"
+
+	k8s "github.com/samsung-cnct/cma-aks/pkg/util/k8s"
 )
 
 func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*pb.CreateClusterReply, error) {
@@ -226,5 +228,47 @@ func (s *Server) ScaleCluster(ctx context.Context, in *pb.ScaleClusterMsg) (repl
 	return &pb.ScaleClusterReply{
 		Ok:     true,
 		Status: result,
+	}, nil
+}
+
+func (s *Server) EnableClusterAutoscaling(ctx context.Context, in *pb.EnableClusterAutoscalingMsg) (reply *pb.EnableClusterAutoscalingReply, err error) {
+	// get cluster client
+	clusterClient, err := az.GetClusterClient(in.Credentials.Tenant, in.Credentials.AppId, in.Credentials.Password, in.Credentials.SubscriptionId)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get aks client: %v", err)
+	}
+
+	// get agent pool name
+	cluster, _, err := az.GetCluster(ctx, clusterClient, in.Name)
+	if err != nil {
+		return nil, err
+	}
+	agentPool := *cluster.AgentPoolProfiles
+	agentPoolName := *agentPool[0].Name // AKS supports only 1 node pool at this time
+
+	// create config
+	autoscalingConfig := make(map[string][]byte)
+	autoscalingConfig["ResourceGroup"] = []byte(in.Name + "-group")
+	autoscalingConfig["NodeResourceGroup"] = []byte(*cluster.NodeResourceGroup)
+	autoscalingConfig["ClientID"] = []byte(in.Credentials.AppId)
+	autoscalingConfig["ClientSecret"] = []byte(in.Credentials.Password)
+	autoscalingConfig["TenantID"] = []byte(in.Credentials.Tenant)
+	autoscalingConfig["VMType"] = []byte("AKS")
+	autoscalingConfig["ClusterName"] = []byte(in.Name)
+	autoscalingConfig["SubscriptionID"] = []byte(clusterClient.SubscriptionID)
+
+	// generate the secret for cluster autoscaling
+	secretName := "cluster-autoscaler-azure"
+	secretNamespace := "kube-system"
+	k8s.CreateAutoScaleSecret(secretName, secretNamespace, autoscalingConfig)
+
+	// deploy cluster autoscaling
+	err = k8s.CreateAutoScaleDeployment(agentPoolName, in.MinQuantity, in.MaxQuantity)
+	if err != nil {
+		return nil, fmt.Errorf("error while enabling cluster autoscaling: %v", err)
+	}
+
+	return &pb.EnableClusterAutoscalingReply{
+		Ok: true,
 	}, nil
 }
