@@ -198,6 +198,85 @@
         ]
       }
     },
+    "/api/v1/cluster/scale": {
+      "get": {
+        "summary": "Will retrieve node count",
+        "operationId": "GetClusterNodeCount",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksGetClusterNodeCountReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "Name of the cluster to be looked up.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.app_id",
+            "description": "The AppId for API Access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.tenant",
+            "description": "The Tenant for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.password",
+            "description": "The Password for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "credentials.subscription_id",
+            "description": "The Subscription for API access.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
+      },
+      "put": {
+        "summary": "Will scale a clusters node count",
+        "operationId": "ScaleCluster",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/cmaaksScaleClusterReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/cmaaksScaleClusterMsg"
+            }
+          }
+        ],
+        "tags": [
+          "Cluster"
+        ]
+      }
+    },
     "/api/v1/cluster/upgrade": {
       "get": {
         "summary": "Will retrieve available upgrades of a cluster",
@@ -551,6 +630,26 @@
         }
       }
     },
+    "cmaaksGetClusterNodeCountReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Is the cluster in the system"
+        },
+        "name": {
+          "type": "string",
+          "title": "the available node pool name"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The available node count"
+        }
+      },
+      "title": "Reply with available node count"
+    },
     "cmaaksGetClusterReply": {
       "type": "object",
       "properties": {
@@ -596,6 +695,42 @@
         }
       },
       "title": "Reply for version request"
+    },
+    "cmaaksScaleClusterMsg": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of cluster"
+        },
+        "credentials": {
+          "$ref": "#/definitions/cmaaksAzureCredentials",
+          "title": "Credentials to search subscription for clusters"
+        },
+        "node_pool": {
+          "type": "string",
+          "title": "name of node pool"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "total desired nodes"
+        }
+      }
+    },
+    "cmaaksScaleClusterReply": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "wheather or not the cluster was scaled"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of the request"
+        }
+      }
     },
     "cmaaksUpgrade": {
       "type": "object",

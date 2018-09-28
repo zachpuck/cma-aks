@@ -196,9 +196,9 @@ func UpgradeCluster(ctx context.Context, clusterClient containerservice.ManagedC
 
 	// check cluster status before upgrading
 	if *c.ProvisioningState != "Succeeded" {
-		return "", fmt.Errorf("Unable to upgrade cluster while it is currently %v", *c.ProvisioningState) 
+		return "", fmt.Errorf("Unable to upgrade cluster while it is currently %v", *c.ProvisioningState)
 	}
- 
+
 	future, err := clusterClient.CreateOrUpdate(
 		ctx,
 		resourceGroupName,
@@ -217,6 +217,76 @@ func UpgradeCluster(ctx context.Context, clusterClient containerservice.ManagedC
 	status = future.Status()
 	if status != "Upgrading" {
 		return "", fmt.Errorf("cannot upgrade cluster: %v", status)
+	}
+
+	return status, nil
+}
+
+// GetClusterNodeCount returns the current number of nodes in the agent pool
+func GetClusterNodeCount(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (agent Agent, err error) {
+	resourceGroupName := resourceName + "-group"
+
+	c, err := clusterClient.Get(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
+	}
+
+	temp := c.ManagedClusterProperties.AgentPoolProfiles
+	for _, v := range *temp {
+		agent.Name = v.Name
+		agent.Count = v.Count
+	}
+	return agent, nil
+}
+
+// ScaleClusterNodeCount sets the total number of nodes based on the count input
+func ScaleClusterNodeCount(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string, nodePool string, count int32) (status string, err error) {
+	resourceGroupName := resourceName + "-group"
+
+	// get current cluster
+	c, err := clusterClient.Get(ctx, resourceGroupName, resourceName)
+	if err != nil {
+		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
+	}
+
+	// check cluster status before scaling
+	if *c.ProvisioningState != "Succeeded" {
+		return "", fmt.Errorf("Unable to update cluster while it is currently %v", *c.ProvisioningState)
+	}
+
+	// get the current VMSize from the cluster
+	var vmSize containerservice.VMSizeTypes
+	for _, v := range *c.ManagedClusterProperties.AgentPoolProfiles {
+		if *v.Name == nodePool {
+			vmSize = v.VMSize
+		}
+	}
+
+	// scale cluster
+	future, err := clusterClient.CreateOrUpdate(
+		ctx,
+		resourceGroupName,
+		resourceName,
+		containerservice.ManagedCluster{
+			Location: c.Location,
+			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
+				AgentPoolProfiles: &[]containerservice.ManagedClusterAgentPoolProfile{
+					{
+						Name:  to.StringPtr(nodePool),
+						Count: to.Int32Ptr(count),
+						VMSize: vmSize,
+					},
+				},
+			},
+		},
+	)
+	if err != nil {
+		return "", fmt.Errorf("cannot scale cluster: %v", err)
+	}
+
+	status = future.Status()
+	if status != "Updating" {
+		return "", fmt.Errorf("unable to scale: %v", err)
 	}
 
 	return status, nil
