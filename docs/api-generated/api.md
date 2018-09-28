@@ -16,6 +16,8 @@
     - [CreateClusterReply](#cmaaks.CreateClusterReply)
     - [DeleteClusterMsg](#cmaaks.DeleteClusterMsg)
     - [DeleteClusterReply](#cmaaks.DeleteClusterReply)
+    - [EnableClusterAutoscalingMsg](#cmaaks.EnableClusterAutoscalingMsg)
+    - [EnableClusterAutoscalingReply](#cmaaks.EnableClusterAutoscalingReply)
     - [GetClusterListMsg](#cmaaks.GetClusterListMsg)
     - [GetClusterListReply](#cmaaks.GetClusterListReply)
     - [GetClusterMsg](#cmaaks.GetClusterMsg)
@@ -53,6 +55,8 @@
     - [CreateClusterReply](#cmaaks.CreateClusterReply)
     - [DeleteClusterMsg](#cmaaks.DeleteClusterMsg)
     - [DeleteClusterReply](#cmaaks.DeleteClusterReply)
+    - [EnableClusterAutoscalingMsg](#cmaaks.EnableClusterAutoscalingMsg)
+    - [EnableClusterAutoscalingReply](#cmaaks.EnableClusterAutoscalingReply)
     - [GetClusterListMsg](#cmaaks.GetClusterListMsg)
     - [GetClusterListReply](#cmaaks.GetClusterListReply)
     - [GetClusterMsg](#cmaaks.GetClusterMsg)
@@ -292,6 +296,39 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 
 
 
+<a name="cmaaks.EnableClusterAutoscalingMsg"></a>
+
+### EnableClusterAutoscalingMsg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of the cluster |
+| min_quantity | [int32](#int32) |  | Minimum number of nodes for autoscaling |
+| max_quantity | [int32](#int32) |  | Maximum number of nodes for autoscaling |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to access the cluster |
+
+
+
+
+
+
+<a name="cmaaks.EnableClusterAutoscalingReply"></a>
+
+### EnableClusterAutoscalingReply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | Whether or not cluster autoscaling was enabled by this request |
+
+
+
+
+
+
 <a name="cmaaks.GetClusterListMsg"></a>
 
 ### GetClusterListMsg
@@ -602,6 +639,7 @@ available upgrade version
 | UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
 | GetClusterNodeCount | [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg) | [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply) | Will retrieve node count |
 | ScaleCluster | [ScaleClusterMsg](#cmaaks.ScaleClusterMsg) | [ScaleClusterReply](#cmaaks.ScaleClusterReply) | Will scale a clusters node count |
+| EnableClusterAutoscaling | [EnableClusterAutoscalingMsg](#cmaaks.EnableClusterAutoscalingMsg) | [EnableClusterAutoscalingReply](#cmaaks.EnableClusterAutoscalingReply) | Will enable cluster autoscaling |
 
  
 
@@ -818,6 +856,39 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 
 
 
+<a name="cmaaks.EnableClusterAutoscalingMsg"></a>
+
+### EnableClusterAutoscalingMsg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of the cluster |
+| min_quantity | [int32](#int32) |  | Minimum number of nodes for autoscaling |
+| max_quantity | [int32](#int32) |  | Maximum number of nodes for autoscaling |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to access the cluster |
+
+
+
+
+
+
+<a name="cmaaks.EnableClusterAutoscalingReply"></a>
+
+### EnableClusterAutoscalingReply
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ok | [bool](#bool) |  | Whether or not cluster autoscaling was enabled by this request |
+
+
+
+
+
+
 <a name="cmaaks.GetClusterListMsg"></a>
 
 ### GetClusterListMsg
@@ -1128,6 +1199,7 @@ available upgrade version
 | UpgradeCluster | [UpgradeClusterMsg](#cmaaks.UpgradeClusterMsg) | [UpgradeClusterReply](#cmaaks.UpgradeClusterReply) | Will upgrade a cluster |
 | GetClusterNodeCount | [GetClusterNodeCountMsg](#cmaaks.GetClusterNodeCountMsg) | [GetClusterNodeCountReply](#cmaaks.GetClusterNodeCountReply) | Will retrieve node count |
 | ScaleCluster | [ScaleClusterMsg](#cmaaks.ScaleClusterMsg) | [ScaleClusterReply](#cmaaks.ScaleClusterReply) | Will scale a clusters node count |
+| EnableClusterAutoscaling | [EnableClusterAutoscalingMsg](#cmaaks.EnableClusterAutoscalingMsg) | [EnableClusterAutoscalingReply](#cmaaks.EnableClusterAutoscalingReply) | Will enable cluster autoscaling |
 
  
 

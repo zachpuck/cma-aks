@@ -97,6 +97,13 @@ service Cluster {
     rpc ScaleCluster (ScaleClusterMsg) returns (ScaleClusterReply) {
         option (google.api.http) = {
             put : "/api/v1/cluster/scale"
+            body: "*"
+        };
+    }
+    // Will enable cluster autoscaling
+    rpc EnableClusterAutoscaling (EnableClusterAutoscalingMsg) returns (EnableClusterAutoscalingReply) {
+        option (google.api.http) = {
+            put : "/api/v1/cluster/autoscaling"
             body : "*"
         };
     }
@@ -356,4 +363,19 @@ message ScaleClusterReply {
     bool ok = 1;
     // Status of the request
     string status = 2;
+}
+message EnableClusterAutoscalingMsg {
+    // Name of the cluster
+    string name = 1;
+    // Minimum number of nodes for autoscaling
+    int32 min_quantity = 2;
+    // Maximum number of nodes for autoscaling
+    int32 max_quantity = 3;
+    // Credentials to access the cluster
+    AzureCredentials credentials = 4;
+}
+
+message EnableClusterAutoscalingReply {
+    // Whether or not cluster autoscaling was enabled by this request
+    bool ok = 1;
 }
