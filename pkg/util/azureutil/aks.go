@@ -6,7 +6,6 @@ package azureutil
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
@@ -14,49 +13,45 @@ import (
 	"github.com/Azure/go-autorest/autorest/to"
 )
 
-// ClusterParameters are used to create a new aks cluster
-type ClusterParameters struct {
-	Name              string
-	Location          string
-	KubernetesVersion string
-	ClientID          string
-	ClientSecret      string
-	AgentPools        []Agent
-	Tags              map[string]*string
-}
-
-// Agent is used to define properties for each instance group
-type Agent struct {
-	Name    *string
-	Count   *int32
-	MaxPods *int32
-	Type    string
+type AKS struct {
+	Client containerservice.ManagedClustersClient
 }
 
 // GetClusterClient creates a new aks cluster client and authorizes access
-func GetClusterClient(tenantID string, clientID string, clientSecret string, subscriptionID string) (containerservice.ManagedClustersClient, error) {
+func (a *AKS) GetClusterClient(input ClusterClientInput) (ClusterClientOutput, error) {
 	// create new cluster client in subscription
-	aksClient := containerservice.NewManagedClustersClient(subscriptionID)
+	client := containerservice.NewManagedClustersClient(input.SubscriptionID)
 
 	// authorize request
-	clientConfig := auth.NewClientCredentialsConfig(clientID, clientSecret, tenantID)
+	clientConfig := auth.NewClientCredentialsConfig(input.ClientID, input.ClientSecret, input.TenantID)
 	authorizer, err := clientConfig.Authorizer()
 	if err != nil {
-		return aksClient, fmt.Errorf("failed to initialize authorizer: %v", err)
+		return ClusterClientOutput{}, fmt.Errorf("failed to initialize authorizer: %v", err)
 	}
 
-	aksClient.Authorizer = authorizer
-	return aksClient, nil
+	client.Authorizer = authorizer
+
+	output := ClusterClientOutput{
+		Client: client,
+	}
+	return output, nil
+}
+
+// SetClient sets the client for an AKS
+func (a *AKS) SetClient(client containerservice.ManagedClustersClient) *AKS {
+	a.Client = client
+	return a
 }
 
 // GetCluster retrieves a specific aks cluster
-func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (c containerservice.ManagedCluster, kubeConfig string, err error) {
-	resourceGroupName := resourceName + "-group"
+func (a *AKS) GetCluster(input GetClusterInput) (GetClusterOutput, error) {
+	var kubeConfig string
+	resourceGroupName := input.Name + "-group"
 
 	// get kubeconfig for environment
-	credentialResults, err := clusterClient.ListClusterAdminCredentials(ctx, resourceGroupName, resourceName)
+	credentialResults, err := a.Client.ListClusterAdminCredentials(input.Ctx, resourceGroupName, input.Name)
 	if err != nil {
-		log.Printf("err getting cluster credentails: %v", err)
+		return GetClusterOutput{}, fmt.Errorf("err getting cluster credentails: %v", err)
 	}
 	if credentialResults.Kubeconfigs != nil {
 		for _, v := range *credentialResults.Kubeconfigs {
@@ -66,21 +61,32 @@ func GetCluster(ctx context.Context, clusterClient containerservice.ManagedClust
 		}
 	}
 
-	c, err = clusterClient.Get(ctx, resourceGroupName, resourceName)
+	c, err := a.Client.Get(input.Ctx, resourceGroupName, input.Name)
 	if err != nil {
-		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
+		return GetClusterOutput{}, fmt.Errorf("Error getting cluster %v: %v\n", input.Name, err)
 	}
 
-	return c, kubeConfig, err
+	output := GetClusterOutput{
+		Cluster: ClusterDetailItem{
+			ID:                *c.ID,
+			Name:              *c.Name,
+			Status:            *c.ProvisioningState,
+			Kubeconfig:        kubeConfig,
+			AgentPoolProfiles: c.AgentPoolProfiles,
+			NodeResourceGroup: c.NodeResourceGroup,
+		},
+	}
+
+	return output, err
 }
 
 // CreateCluster creates a new managed Kubernetes cluster
-func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (status string, err error) {
-	resourceGroupName := parameters.Name + "-group"
+func (a *AKS) CreateCluster(ctx context.Context, input CreateClusterInput) (CreateClusterOutput, error) {
+	resourceGroupName := input.Name + "-group"
 
 	// create map of containerservice.ManagedClusterAgentPoolProfile from parameters.AgentPools
-	agentPoolProfiles := make([]containerservice.ManagedClusterAgentPoolProfile, len(parameters.AgentPools))
-	for i := range parameters.AgentPools {
+	agentPoolProfiles := make([]containerservice.ManagedClusterAgentPoolProfile, len(input.AgentPools))
+	for i := range input.AgentPools {
 		var vmSize containerservice.VMSizeTypes
 
 		// get list of available VM size types
@@ -89,191 +95,207 @@ func CreateCluster(ctx context.Context, clusterClient containerservice.ManagedCl
 			// convert the vmSizeTypes to a string
 			typeAsStr := string(vmSizeTypes[j])
 			// compare input type against available vm size types
-			if parameters.AgentPools[i].Type == typeAsStr {
+			if input.AgentPools[i].Type == typeAsStr {
 				vmSize = vmSizeTypes[j]
 			}
 		}
 		if vmSize == "" {
-			return "", fmt.Errorf("invalid VM Size selected")
+			return CreateClusterOutput{}, fmt.Errorf("invalid VM Size selected")
 		}
 
 		agentPoolProfiles[i] = containerservice.ManagedClusterAgentPoolProfile{
-			Name:    parameters.AgentPools[i].Name,
-			Count:   parameters.AgentPools[i].Count,
-			VMSize:  vmSize,
+			Name:   input.AgentPools[i].Name,
+			Count:  input.AgentPools[i].Count,
+			VMSize: vmSize,
 		}
 	}
 
-	future, err := clusterClient.CreateOrUpdate(
+	future, err := a.Client.CreateOrUpdate(
 		ctx,
 		resourceGroupName,
-		parameters.Name,
+		input.Name,
 		containerservice.ManagedCluster{
-			Name:     &parameters.Name,
-			Location: &parameters.Location,
+			Name:     &input.Name,
+			Location: &input.Location,
 			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
-				DNSPrefix:         &parameters.Name,
-				KubernetesVersion: &parameters.KubernetesVersion,
+				DNSPrefix:         &input.Name,
+				KubernetesVersion: &input.K8sVersion,
 				AgentPoolProfiles: &agentPoolProfiles,
 				ServicePrincipalProfile: &containerservice.ManagedClusterServicePrincipalProfile{
-					ClientID: to.StringPtr(parameters.ClientID),
-					Secret:   to.StringPtr(parameters.ClientSecret),
+					ClientID: to.StringPtr(input.ClientID),
+					Secret:   to.StringPtr(input.ClientSecret),
 				},
 			},
-			Tags: parameters.Tags,
+			Tags: input.Tags,
 		},
 	)
 	if err != nil {
-		return "", fmt.Errorf("cannot create aks cluster: %v", err)
+		return CreateClusterOutput{}, fmt.Errorf("cannot create aks cluster: %v", err)
 	}
 
-	status = future.Status()
+	status := future.Status()
 	if status != "Creating" {
-		return "", fmt.Errorf("cannot create cluster: %v", status)
+		return CreateClusterOutput{}, fmt.Errorf("cannot create cluster: %v", status)
 	}
 
-	return status, nil
+	output := CreateClusterOutput{
+		Status: status,
+	}
+	return output, nil
 }
 
 // DeleteCluster deletes an existing aks cluster
-func DeleteCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (result string, err error) {
-	resourceGroupName := resourceName + "-group"
+func (a *AKS) DeleteCluster(ctx context.Context, input DeleteClusterInput) (DeleteClusterOutput, error) {
+	resourceGroupName := input.Name + "-group"
 
-	future, err := clusterClient.Delete(ctx, resourceGroupName, resourceName)
+	future, err := a.Client.Delete(ctx, resourceGroupName, input.Name)
 	if err != nil {
-		return result, fmt.Errorf("error deleting cluster: %v", err)
+		return DeleteClusterOutput{}, fmt.Errorf("error deleting cluster: %v", err)
 	}
 
-	result = future.Status()
-	if result != "InProgress" {
-		return "", fmt.Errorf("current status of delete: %v", result)
+	status := future.Status()
+	if status != "InProgress" {
+		return DeleteClusterOutput{}, fmt.Errorf("current status of delete: %v", status)
 	}
 
-	msg := "Deleting " + resourceName + " cluster"
+	output := DeleteClusterOutput{
+		Status: "Deleting " + input.Name + " cluster",
+	}
 
-	return msg, err
+	return output, err
 
 	// TODO: delete resource group also, if nothing else is in it
 }
 
 // ListClusters will list all clusters in the subscription
-func ListClusters(ctx context.Context, clusterClient containerservice.ManagedClustersClient) ([]containerservice.ManagedCluster, error) {
-	results, err := clusterClient.List(ctx)
+func (a *AKS) ListClusters(input ListClusterInput) (ListClusterOutput, error) {
+	result, err := a.Client.List(input.Ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error listing clusters: %v", err)
+		return ListClusterOutput{}, fmt.Errorf("error listing clusters: %v", err)
 	}
 
-	return results.Values(), nil
+	output := ListClusterOutput{
+		Clusters: result.Values(),
+	}
+	return output, nil
 }
 
 // GetClusterUpgrades lists the kubernetes upgrades available on the cluster
-func GetClusterUpgrades(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) ([]string, error) {
-	resourceGroupName := resourceName + "-group"
+func (a *AKS) GetClusterUpgrades(input GetClusterUpgradeInput) (GetClusterUpgradeOutput, error) {
+	resourceGroupName := input.Name + "-group"
 
-	result, err := clusterClient.GetUpgradeProfile(ctx, resourceGroupName, resourceName)
+	result, err := a.Client.GetUpgradeProfile(input.Ctx, resourceGroupName, input.Name)
 	if err != nil {
-		return nil, fmt.Errorf("error getting available upgrades: %v", err)
+		return GetClusterUpgradeOutput{}, fmt.Errorf("error getting available upgrades: %v", err)
 	}
 
 	for _, v := range *result.AgentPoolProfiles {
 		if v.Upgrades != nil {
-			return *v.Upgrades, nil
+			return GetClusterUpgradeOutput{
+				Upgrades: *v.Upgrades,
+			}, nil
 		}
 	}
 
-	return nil, nil
+	return GetClusterUpgradeOutput{}, nil
 }
 
 // UpgradeCluster upgrades the cluster to the provided kubernetes version
-func UpgradeCluster(ctx context.Context, clusterClient containerservice.ManagedClustersClient, parameters ClusterParameters) (status string, err error) {
-	resourceGroupName := parameters.Name + "-group"
+func (a *AKS) UpgradeCluster(input UpgradeClusterInput) (UpgradeClusterOutput, error) {
+	resourceGroupName := input.Name + "-group"
 
 	// Get the location from cluster properties
-	c, err := clusterClient.Get(ctx, resourceGroupName, parameters.Name)
+	c, err := a.Client.Get(input.Ctx, resourceGroupName, input.Name)
 	if err != nil {
-		fmt.Printf("Error getting location for cluster %v: %v\n", parameters.Name, err)
+		fmt.Printf("Error getting location for cluster %v: %v\n", input.Name, err)
 	}
 
 	// check cluster status before upgrading
 	if *c.ProvisioningState != "Succeeded" {
-		return "", fmt.Errorf("Unable to upgrade cluster while it is currently %v", *c.ProvisioningState)
+		return UpgradeClusterOutput{}, fmt.Errorf("Unable to upgrade cluster while it is currently %v", *c.ProvisioningState)
 	}
 
-	future, err := clusterClient.CreateOrUpdate(
-		ctx,
+	future, err := a.Client.CreateOrUpdate(
+		input.Ctx,
 		resourceGroupName,
-		parameters.Name,
+		input.Name,
 		containerservice.ManagedCluster{
 			Location: c.Location,
 			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
-				KubernetesVersion: &parameters.KubernetesVersion,
+				KubernetesVersion: &input.K8sVersion,
 			},
 		},
 	)
 	if err != nil {
-		return "", fmt.Errorf("cannot upgrade cluster: %v", err)
+		return UpgradeClusterOutput{}, fmt.Errorf("cannot upgrade cluster: %v", err)
 	}
 
-	status = future.Status()
+	status := future.Status()
 	if status != "Upgrading" {
-		return "", fmt.Errorf("cannot upgrade cluster: %v", status)
+		return UpgradeClusterOutput{}, fmt.Errorf("cannot upgrade cluster: %v", status)
 	}
 
-	return status, nil
+	output := UpgradeClusterOutput{
+		Status: status,
+	}
+	return output, nil
 }
 
 // GetClusterNodeCount returns the current number of nodes in the agent pool
-func GetClusterNodeCount(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string) (agent Agent, err error) {
-	resourceGroupName := resourceName + "-group"
+func (a *AKS) GetClusterNodeCount(input ClusterNodeCountInput) (ClusterNodeCountOutput, error) {
+	resourceGroupName := input.Name + "-group"
 
-	c, err := clusterClient.Get(ctx, resourceGroupName, resourceName)
+	c, err := a.Client.Get(input.Ctx, resourceGroupName, input.Name)
 	if err != nil {
-		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
+		return ClusterNodeCountOutput{}, fmt.Errorf("error getting cluster %v: %v", input.Name, err)
 	}
 
-	temp := c.ManagedClusterProperties.AgentPoolProfiles
-	for _, v := range *temp {
+	agentPool := c.ManagedClusterProperties.AgentPoolProfiles
+	var agent Agent
+	for _, v := range *agentPool {
 		agent.Name = v.Name
 		agent.Count = v.Count
 	}
-	return agent, nil
+	return ClusterNodeCountOutput{
+		Agent: agent,
+	}, nil
 }
 
 // ScaleClusterNodeCount sets the total number of nodes based on the count input
-func ScaleClusterNodeCount(ctx context.Context, clusterClient containerservice.ManagedClustersClient, resourceName string, nodePool string, count int32) (status string, err error) {
-	resourceGroupName := resourceName + "-group"
+func (a *AKS) ScaleClusterNodeCount(input ScaleClusterInput) (ScaleClusterOutput, error) {
+	resourceGroupName := input.Name + "-group"
 
 	// get current cluster
-	c, err := clusterClient.Get(ctx, resourceGroupName, resourceName)
+	c, err := a.Client.Get(input.Ctx, resourceGroupName, input.Name)
 	if err != nil {
-		fmt.Printf("Error getting cluster %v: %v\n", resourceName, err)
+		return ScaleClusterOutput{}, fmt.Errorf("error getting cluster %v: %v", input.Name, err)
 	}
 
 	// check cluster status before scaling
 	if *c.ProvisioningState != "Succeeded" {
-		return "", fmt.Errorf("Unable to update cluster while it is currently %v", *c.ProvisioningState)
+		return ScaleClusterOutput{}, fmt.Errorf("Unable to update cluster while it is currently %v", *c.ProvisioningState)
 	}
 
 	// get the current VMSize from the cluster
 	var vmSize containerservice.VMSizeTypes
 	for _, v := range *c.ManagedClusterProperties.AgentPoolProfiles {
-		if *v.Name == nodePool {
+		if *v.Name == input.NodePool {
 			vmSize = v.VMSize
 		}
 	}
 
 	// scale cluster
-	future, err := clusterClient.CreateOrUpdate(
-		ctx,
+	future, err := a.Client.CreateOrUpdate(
+		input.Ctx,
 		resourceGroupName,
-		resourceName,
+		input.Name,
 		containerservice.ManagedCluster{
 			Location: c.Location,
 			ManagedClusterProperties: &containerservice.ManagedClusterProperties{
 				AgentPoolProfiles: &[]containerservice.ManagedClusterAgentPoolProfile{
 					{
-						Name:  to.StringPtr(nodePool),
-						Count: to.Int32Ptr(count),
+						Name:   to.StringPtr(input.NodePool),
+						Count:  to.Int32Ptr(input.Count),
 						VMSize: vmSize,
 					},
 				},
@@ -281,13 +303,15 @@ func ScaleClusterNodeCount(ctx context.Context, clusterClient containerservice.M
 		},
 	)
 	if err != nil {
-		return "", fmt.Errorf("cannot scale cluster: %v", err)
+		return ScaleClusterOutput{}, fmt.Errorf("cannot scale cluster: %v", err)
 	}
 
-	status = future.Status()
+	status := future.Status()
 	if status != "Updating" {
-		return "", fmt.Errorf("unable to scale: %v", err)
+		return ScaleClusterOutput{}, fmt.Errorf("unable to scale: %v", err)
 	}
 
-	return status, nil
+	return ScaleClusterOutput{
+		Status: status,
+	}, nil
 }
