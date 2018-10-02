@@ -9,10 +9,6 @@ import (
 	k8s "github.com/samsung-cnct/cma-aks/pkg/util/k8s"
 )
 
-var (
-	aks az.ClientInterface
-)
-
 func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*pb.CreateClusterReply, error) {
 
 	// check if resource group exists
@@ -27,6 +23,7 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	}
 
 	// create cluster client
+	aks := az.AKS{}
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Provider.Azure.Credentials.Tenant,
 		ClientID:       in.Provider.Azure.Credentials.AppId,
@@ -53,8 +50,7 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	}
 
 	// create cluster
-	output, err := aks.CreateCluster(az.CreateClusterInput{
-		Ctx:          ctx,
+	output, err := aks.CreateCluster(ctx, az.CreateClusterInput{
 		Name:         in.Name,
 		Location:     in.Provider.Azure.Location,
 		K8sVersion:   in.Provider.K8SVersion,
@@ -81,6 +77,7 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 
 func (s *Server) GetCluster(ctx context.Context, in *pb.GetClusterMsg) (*pb.GetClusterReply, error) {
 
+	aks := az.AKS{}
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
 		ClientID:       in.Credentials.AppId,
@@ -92,8 +89,7 @@ func (s *Server) GetCluster(ctx context.Context, in *pb.GetClusterMsg) (*pb.GetC
 	}
 	aks.SetClient(newClient.Client)
 
-	output, err := aks.GetCluster(az.GetClusterInput{
-		Ctx:  ctx,
+	output, err := aks.GetCluster(ctx, az.GetClusterInput{
 		Name: in.Name,
 	})
 	if err != nil {
@@ -112,6 +108,7 @@ func (s *Server) GetCluster(ctx context.Context, in *pb.GetClusterMsg) (*pb.GetC
 
 func (s *Server) DeleteCluster(ctx context.Context, in *pb.DeleteClusterMsg) (*pb.DeleteClusterReply, error) {
 
+	aks := az.AKS{}
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
 		ClientID:       in.Credentials.AppId,
@@ -123,8 +120,7 @@ func (s *Server) DeleteCluster(ctx context.Context, in *pb.DeleteClusterMsg) (*p
 	}
 	aks.SetClient(newClient.Client)
 
-	output, err := aks.DeleteCluster(az.DeleteClusterInput{
-		Ctx:  ctx,
+	output, err := aks.DeleteCluster(ctx, az.DeleteClusterInput{
 		Name: in.Name,
 	})
 	if err != nil {
@@ -139,6 +135,7 @@ func (s *Server) DeleteCluster(ctx context.Context, in *pb.DeleteClusterMsg) (*p
 
 func (s *Server) GetClusterList(ctx context.Context, in *pb.GetClusterListMsg) (reply *pb.GetClusterListReply, err error) {
 
+	aks := az.AKS{}
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
 		ClientID:       in.Credentials.AppId,
@@ -150,9 +147,7 @@ func (s *Server) GetClusterList(ctx context.Context, in *pb.GetClusterListMsg) (
 	}
 	aks.SetClient(newClient.Client)
 
-	output, err := aks.ListClusters(az.ListClusterInput{
-		Ctx: ctx,
-	})
+	output, err := aks.ListClusters(ctx, az.ListClusterInput{})
 	if err != nil {
 		return nil, err
 	}
@@ -175,6 +170,7 @@ func (s *Server) GetClusterList(ctx context.Context, in *pb.GetClusterListMsg) (
 }
 
 func (s *Server) GetClusterUpgrades(ctx context.Context, in *pb.GetClusterUpgradesMsg) (reply *pb.GetClusterUpgradesReply, err error) {
+	aks := az.AKS{}
 
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
@@ -187,8 +183,7 @@ func (s *Server) GetClusterUpgrades(ctx context.Context, in *pb.GetClusterUpgrad
 	}
 	aks.SetClient(newClient.Client)
 
-	output, err := aks.GetClusterUpgrades(az.GetClusterUpgradeInput{
-		Ctx:  ctx,
+	output, err := aks.GetClusterUpgrades(ctx, az.GetClusterUpgradeInput{
 		Name: in.Name,
 	})
 	if err != nil {
@@ -211,6 +206,7 @@ func (s *Server) GetClusterUpgrades(ctx context.Context, in *pb.GetClusterUpgrad
 }
 
 func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (*pb.UpgradeClusterReply, error) {
+	aks := az.AKS{}
 
 	// get cluster client
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
@@ -225,8 +221,7 @@ func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (
 	aks.SetClient(newClient.Client)
 
 	// upgrade cluster
-	output, err := aks.UpgradeCluster(az.UpgradeClusterInput{
-		Ctx:        ctx,
+	output, err := aks.UpgradeCluster(ctx, az.UpgradeClusterInput{
 		Name:       in.Name,
 		K8sVersion: in.Provider.K8SVersion,
 	})
@@ -247,7 +242,7 @@ func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (
 }
 
 func (s *Server) GetClusterNodeCount(ctx context.Context, in *pb.GetClusterNodeCountMsg) (reply *pb.GetClusterNodeCountReply, err error) {
-
+	aks := az.AKS{}
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
 		ClientID:       in.Credentials.AppId,
@@ -259,8 +254,7 @@ func (s *Server) GetClusterNodeCount(ctx context.Context, in *pb.GetClusterNodeC
 	}
 	aks.SetClient(newClient.Client)
 
-	output, err := aks.GetClusterNodeCount(az.ClusterNodeCountInput{
-		Ctx:  ctx,
+	output, err := aks.GetClusterNodeCount(ctx, az.ClusterNodeCountInput{
 		Name: in.Name,
 	})
 	if err != nil {
@@ -275,7 +269,7 @@ func (s *Server) GetClusterNodeCount(ctx context.Context, in *pb.GetClusterNodeC
 }
 
 func (s *Server) ScaleCluster(ctx context.Context, in *pb.ScaleClusterMsg) (reply *pb.ScaleClusterReply, err error) {
-
+	aks := az.AKS{}
 	// get cluster client
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
@@ -288,8 +282,7 @@ func (s *Server) ScaleCluster(ctx context.Context, in *pb.ScaleClusterMsg) (repl
 	}
 	aks.SetClient(newClient.Client)
 
-	output, err := aks.ScaleClusterNodeCount(az.ScaleClusterInput{
-		Ctx:      ctx,
+	output, err := aks.ScaleClusterNodeCount(ctx, az.ScaleClusterInput{
 		Name:     in.Name,
 		NodePool: in.NodePool,
 		Count:    in.Count,
@@ -305,6 +298,7 @@ func (s *Server) ScaleCluster(ctx context.Context, in *pb.ScaleClusterMsg) (repl
 }
 
 func (s *Server) EnableClusterAutoscaling(ctx context.Context, in *pb.EnableClusterAutoscalingMsg) (reply *pb.EnableClusterAutoscalingReply, err error) {
+	aks := az.AKS{}
 	// get cluster client
 	newClient, err := aks.GetClusterClient(az.ClusterClientInput{
 		TenantID:       in.Credentials.Tenant,
@@ -318,8 +312,7 @@ func (s *Server) EnableClusterAutoscaling(ctx context.Context, in *pb.EnableClus
 	aks.SetClient(newClient.Client)
 
 	// get agent pool name
-	cluster, err := aks.GetCluster(az.GetClusterInput{
-		Ctx:  ctx,
+	cluster, err := aks.GetCluster(ctx, az.GetClusterInput{
 		Name: in.Name,
 	})
 	if err != nil {

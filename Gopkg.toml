@@ -26,6 +26,14 @@
 
 
 [[constraint]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  version = "21.1.0"
+
+[[constraint]]
+  name = "github.com/Azure/go-autorest"
+  version = "10.15.5"
+
+[[constraint]]
   name = "github.com/elazarl/go-bindata-assetfs"
   version = "1.0.0"
 
@@ -35,11 +43,19 @@
 
 [[constraint]]
   name = "github.com/grpc-ecosystem/grpc-gateway"
-  version = "1.4.1"
+  version = "1.5.1"
 
 [[constraint]]
   branch = "master"
   name = "github.com/juju/loggo"
+
+[[constraint]]
+  name = "github.com/onsi/ginkgo"
+  version = "1.6.0"
+
+[[constraint]]
+  name = "github.com/onsi/gomega"
+  version = "1.4.2"
 
 [[constraint]]
   branch = "master"
@@ -55,7 +71,7 @@
 
 [[constraint]]
   name = "github.com/spf13/viper"
-  version = "1.1.0"
+  version = "1.2.1"
 
 [[constraint]]
   branch = "master"
@@ -67,19 +83,16 @@
 
 [[constraint]]
   name = "google.golang.org/grpc"
-  version = "1.14.0"
+  version = "1.15.0"
+
+[[constraint]]
+  branch = "master"
+  name = "k8s.io/api"
+
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "8.0.0"
 
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  version = "kubernetes-1.11.2"
-#  branch = "master"
-  name = "k8s.io/api"
-
-[[constraint]]
-  version = "kubernetes-1.11.2"
-#  branch = "master"
-  name = "k8s.io/apimachinery"
-

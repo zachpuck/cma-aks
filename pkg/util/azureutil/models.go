@@ -1,7 +1,6 @@
 package azureutil
 
 import (
-	"context"
 	"github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2018-03-31/containerservice"
 )
 
@@ -20,7 +19,6 @@ type ClusterClientOutput struct {
 
 // CreateClusterInput is used to create a new cluster
 type CreateClusterInput struct {
-	Ctx          context.Context
 	Name         string
 	Location     string
 	K8sVersion   string
@@ -45,7 +43,6 @@ type CreateClusterOutput struct {
 
 // GetClusterInput is used to retrieve a cluster
 type GetClusterInput struct {
-	Ctx  context.Context
 	Name string
 }
 
@@ -56,7 +53,6 @@ type GetClusterOutput struct {
 
 // UpgradeClusterInput is used to upgrade an existing cluster
 type UpgradeClusterInput struct {
-	Ctx        context.Context
 	Name       string
 	K8sVersion string
 }
@@ -78,7 +74,6 @@ type ClusterDetailItem struct {
 
 // DeleteClusterInput is used to delete an existing cluster
 type DeleteClusterInput struct {
-	Ctx  context.Context
 	Name string
 }
 
@@ -88,9 +83,7 @@ type DeleteClusterOutput struct {
 }
 
 // ListClusterInput is used to retrieve a list of clusters
-type ListClusterInput struct {
-	Ctx context.Context
-}
+type ListClusterInput struct {}
 
 // ListClusterOutput shows the list of available clusters
 type ListClusterOutput struct {
@@ -99,7 +92,6 @@ type ListClusterOutput struct {
 
 // GetClusterUpgradeInput is used to retrieve the available k8s upgrades for a cluster
 type GetClusterUpgradeInput struct {
-	Ctx  context.Context
 	Name string
 }
 
@@ -110,7 +102,6 @@ type GetClusterUpgradeOutput struct {
 
 // ClusterNodeCountInput is used to retrieve the current number of worker nodes in the cluster
 type ClusterNodeCountInput struct {
-	Ctx  context.Context
 	Name string
 }
 
@@ -121,7 +112,6 @@ type ClusterNodeCountOutput struct {
 
 // ScaleClusterInput is used to scale the number of worker nodes in a cluster up or down
 type ScaleClusterInput struct {
-	Ctx      context.Context
 	Name     string
 	NodePool string
 	Count    int32

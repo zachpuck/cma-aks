@@ -8,7 +8,7 @@ type ClientInterface interface {
 	GetClusterClient(ClusterClientInput) (ClusterClientOutput, error)
 	CreateCluster(CreateClusterInput) (CreateClusterOutput, error)
 	GetCluster(GetClusterInput) (GetClusterOutput, error)
-	SetClient(client containerservice.ManagedClustersClient)
+	SetClient(client containerservice.ManagedClustersClient) *AKS
 	DeleteCluster(DeleteClusterInput) (DeleteClusterOutput, error)
 	ListClusters(ListClusterInput) (ListClusterOutput, error)
 	GetClusterUpgrades(GetClusterUpgradeInput) (GetClusterUpgradeOutput, error)
