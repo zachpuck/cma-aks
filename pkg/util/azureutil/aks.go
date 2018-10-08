@@ -15,6 +15,7 @@ import (
 
 type AKS struct {
 	Client containerservice.ManagedClustersClient
+	Context context.Context
 }
 
 // GetClusterClient creates a new aks cluster client and authorizes access
@@ -44,12 +45,12 @@ func (a *AKS) SetClient(client containerservice.ManagedClustersClient) *AKS {
 }
 
 // GetCluster retrieves a specific aks cluster
-func (a *AKS) GetCluster(ctx context.Context, input GetClusterInput) (GetClusterOutput, error) {
+func (a *AKS) GetCluster(input GetClusterInput) (GetClusterOutput, error) {
 	var kubeConfig string
 	resourceGroupName := input.Name + "-group"
 
 	// get kubeconfig for environment
-	credentialResults, err := a.Client.ListClusterAdminCredentials(ctx, resourceGroupName, input.Name)
+	credentialResults, err := a.Client.ListClusterAdminCredentials(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		return GetClusterOutput{}, fmt.Errorf("err getting cluster credentails: %v", err)
 	}
@@ -61,7 +62,7 @@ func (a *AKS) GetCluster(ctx context.Context, input GetClusterInput) (GetCluster
 		}
 	}
 
-	c, err := a.Client.Get(ctx, resourceGroupName, input.Name)
+	c, err := a.Client.Get(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		return GetClusterOutput{}, fmt.Errorf("Error getting cluster %v: %v\n", input.Name, err)
 	}
@@ -81,7 +82,7 @@ func (a *AKS) GetCluster(ctx context.Context, input GetClusterInput) (GetCluster
 }
 
 // CreateCluster creates a new managed Kubernetes cluster
-func (a *AKS) CreateCluster(ctx context.Context, input CreateClusterInput) (CreateClusterOutput, error) {
+func (a *AKS) CreateCluster(input CreateClusterInput) (CreateClusterOutput, error) {
 	resourceGroupName := input.Name + "-group"
 
 	// create map of containerservice.ManagedClusterAgentPoolProfile from parameters.AgentPools
@@ -111,7 +112,7 @@ func (a *AKS) CreateCluster(ctx context.Context, input CreateClusterInput) (Crea
 	}
 
 	future, err := a.Client.CreateOrUpdate(
-		ctx,
+		a.Context,
 		resourceGroupName,
 		input.Name,
 		containerservice.ManagedCluster{
@@ -145,10 +146,10 @@ func (a *AKS) CreateCluster(ctx context.Context, input CreateClusterInput) (Crea
 }
 
 // DeleteCluster deletes an existing aks cluster
-func (a *AKS) DeleteCluster(ctx context.Context, input DeleteClusterInput) (DeleteClusterOutput, error) {
+func (a *AKS) DeleteCluster(input DeleteClusterInput) (DeleteClusterOutput, error) {
 	resourceGroupName := input.Name + "-group"
 
-	future, err := a.Client.Delete(ctx, resourceGroupName, input.Name)
+	future, err := a.Client.Delete(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		return DeleteClusterOutput{}, fmt.Errorf("error deleting cluster: %v", err)
 	}
@@ -168,8 +169,8 @@ func (a *AKS) DeleteCluster(ctx context.Context, input DeleteClusterInput) (Dele
 }
 
 // ListClusters will list all clusters in the subscription
-func (a *AKS) ListClusters(ctx context.Context, input ListClusterInput) (ListClusterOutput, error) {
-	result, err := a.Client.List(ctx)
+func (a *AKS) ListClusters(input ListClusterInput) (ListClusterOutput, error) {
+	result, err := a.Client.List(a.Context)
 	if err != nil {
 		return ListClusterOutput{}, fmt.Errorf("error listing clusters: %v", err)
 	}
@@ -181,10 +182,10 @@ func (a *AKS) ListClusters(ctx context.Context, input ListClusterInput) (ListClu
 }
 
 // GetClusterUpgrades lists the kubernetes upgrades available on the cluster
-func (a *AKS) GetClusterUpgrades(ctx context.Context, input GetClusterUpgradeInput) (GetClusterUpgradeOutput, error) {
+func (a *AKS) GetClusterUpgrades(input GetClusterUpgradeInput) (GetClusterUpgradeOutput, error) {
 	resourceGroupName := input.Name + "-group"
 
-	result, err := a.Client.GetUpgradeProfile(ctx, resourceGroupName, input.Name)
+	result, err := a.Client.GetUpgradeProfile(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		return GetClusterUpgradeOutput{}, fmt.Errorf("error getting available upgrades: %v", err)
 	}
@@ -201,11 +202,11 @@ func (a *AKS) GetClusterUpgrades(ctx context.Context, input GetClusterUpgradeInp
 }
 
 // UpgradeCluster upgrades the cluster to the provided kubernetes version
-func (a *AKS) UpgradeCluster(ctx context.Context, input UpgradeClusterInput) (UpgradeClusterOutput, error) {
+func (a *AKS) UpgradeCluster(input UpgradeClusterInput) (UpgradeClusterOutput, error) {
 	resourceGroupName := input.Name + "-group"
 
 	// Get the location from cluster properties
-	c, err := a.Client.Get(ctx, resourceGroupName, input.Name)
+	c, err := a.Client.Get(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		fmt.Printf("Error getting location for cluster %v: %v\n", input.Name, err)
 	}
@@ -216,7 +217,7 @@ func (a *AKS) UpgradeCluster(ctx context.Context, input UpgradeClusterInput) (Up
 	}
 
 	future, err := a.Client.CreateOrUpdate(
-		ctx,
+		a.Context,
 		resourceGroupName,
 		input.Name,
 		containerservice.ManagedCluster{
@@ -242,10 +243,10 @@ func (a *AKS) UpgradeCluster(ctx context.Context, input UpgradeClusterInput) (Up
 }
 
 // GetClusterNodeCount returns the current number of nodes in the agent pool
-func (a *AKS) GetClusterNodeCount(ctx context.Context, input ClusterNodeCountInput) (ClusterNodeCountOutput, error) {
+func (a *AKS) GetClusterNodeCount(input ClusterNodeCountInput) (ClusterNodeCountOutput, error) {
 	resourceGroupName := input.Name + "-group"
 
-	c, err := a.Client.Get(ctx, resourceGroupName, input.Name)
+	c, err := a.Client.Get(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		return ClusterNodeCountOutput{}, fmt.Errorf("error getting cluster %v: %v", input.Name, err)
 	}
@@ -262,11 +263,11 @@ func (a *AKS) GetClusterNodeCount(ctx context.Context, input ClusterNodeCountInp
 }
 
 // ScaleClusterNodeCount sets the total number of nodes based on the count input
-func (a *AKS) ScaleClusterNodeCount(ctx context.Context, input ScaleClusterInput) (ScaleClusterOutput, error) {
+func (a *AKS) ScaleClusterNodeCount(input ScaleClusterInput) (ScaleClusterOutput, error) {
 	resourceGroupName := input.Name + "-group"
 
 	// get current cluster
-	c, err := a.Client.Get(ctx, resourceGroupName, input.Name)
+	c, err := a.Client.Get(a.Context, resourceGroupName, input.Name)
 	if err != nil {
 		return ScaleClusterOutput{}, fmt.Errorf("error getting cluster %v: %v", input.Name, err)
 	}
@@ -286,7 +287,7 @@ func (a *AKS) ScaleClusterNodeCount(ctx context.Context, input ScaleClusterInput
 
 	// scale cluster
 	future, err := a.Client.CreateOrUpdate(
-		ctx,
+		a.Context,
 		resourceGroupName,
 		input.Name,
 		containerservice.ManagedCluster{
