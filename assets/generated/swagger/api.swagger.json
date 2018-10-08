@@ -435,6 +435,25 @@
       },
       "title": "Tags are name/value pairs that enable you to categorize resources and view consolidated billing"
     },
+    "EnableClusterAutoscalingMsgAzureAutoscalingNodeGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of node group"
+        },
+        "min_quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Minimum number of nodes for autoscaling"
+        },
+        "max_quantity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Maximum number of nodes for autoscaling"
+        }
+      }
+    },
     "GetVersionReplyVersionInformation": {
       "type": "object",
       "properties": {
@@ -669,15 +688,12 @@
           "type": "string",
           "title": "Name of the cluster"
         },
-        "min_quantity": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Minimum number of nodes for autoscaling"
-        },
-        "max_quantity": {
-          "type": "integer",
-          "format": "int32",
-          "title": "Maximum number of nodes for autoscaling"
+        "nodegroups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnableClusterAutoscalingMsgAzureAutoscalingNodeGroup"
+          },
+          "title": "Groups to add autoscaling on\nCurrently only one node group is allowed in AKS, will work with more than 1 entry later"
         },
         "credentials": {
           "$ref": "#/definitions/cmaaksAzureCredentials",

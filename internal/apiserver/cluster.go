@@ -336,6 +336,9 @@ func (s *Server) EnableClusterAutoscaling(ctx context.Context, in *pb.EnableClus
 	aks.SetClient(newClient.Client)
 
 	// get agent pool name
+	var agentPoolName string
+	var minQuantity int32
+	var maxQuantity int32
 	cluster, err := aks.GetCluster(az.GetClusterInput{
 		Name: in.Name,
 	})
@@ -343,7 +346,20 @@ func (s *Server) EnableClusterAutoscaling(ctx context.Context, in *pb.EnableClus
 		return nil, err
 	}
 	agentPool := *cluster.Cluster.AgentPoolProfiles
-	agentPoolName := *agentPool[0].Name // AKS supports only 1 node pool at this time
+
+	// find provided node group in existing cluster
+	for i := range agentPool {
+		for j := range in.Nodegroups {
+			if in.Nodegroups[j].Name == *agentPool[i].Name {
+				agentPoolName = in.Nodegroups[j].Name // AKS supports only 1 node pool at this time
+				minQuantity = in.Nodegroups[j].MinQuantity
+				maxQuantity = in.Nodegroups[j].MaxQuantity
+			}
+		}
+	}
+	if agentPoolName == "" {
+		return nil, fmt.Errorf("Unable to find provided nodeGroup in cluster")
+	}
 
 	// create config
 	autoscalingConfig := make(map[string][]byte)
@@ -356,13 +372,18 @@ func (s *Server) EnableClusterAutoscaling(ctx context.Context, in *pb.EnableClus
 	autoscalingConfig["ClusterName"] = []byte(in.Name)
 	autoscalingConfig["SubscriptionID"] = []byte(in.Credentials.SubscriptionId)
 
+	// setup config to call remote cluster
+	config, err := k8s.SetKubeConfig(cluster.Cluster.Name, cluster.Cluster.Kubeconfig)
+
 	// generate the secret for cluster autoscaling
 	secretName := "cluster-autoscaler-azure"
 	secretNamespace := "kube-system"
-	k8s.CreateAutoScaleSecret(secretName, secretNamespace, autoscalingConfig)
+	k8s.CreateAutoScaleSecret(secretName, secretNamespace, autoscalingConfig, config)
 
 	// deploy cluster autoscaling
-	err = k8s.CreateAutoScaleDeployment(agentPoolName, in.MinQuantity, in.MaxQuantity)
+	err = k8s.CreateAutoScaleDeployment(agentPoolName, minQuantity, maxQuantity, config)
+
+	//err = k8s.CreateAutoScaleDeployment(agentPoolName, in.MinQuantity, in.MaxQuantity, config)
 	if err != nil {
 		return nil, fmt.Errorf("error while enabling cluster autoscaling: %v", err)
 	}
