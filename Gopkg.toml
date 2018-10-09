@@ -24,6 +24,9 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[override]]
+  name = "gopkg.in/fsnotify.v1"
+  source = "gopkg.in/fsnotify/fsnotify.v1"
 
 [[constraint]]
   name = "github.com/elazarl/go-bindata-assetfs"
@@ -82,4 +85,3 @@
   version = "kubernetes-1.11.2"
 #  branch = "master"
   name = "k8s.io/apimachinery"
-
