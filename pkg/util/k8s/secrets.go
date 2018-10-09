@@ -7,6 +7,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	"github.com/Azure/go-autorest/autorest/to"
 )
@@ -161,11 +162,11 @@ func CreateKubeconfigSecret(name string, namespace string, kubeconfig []byte) (e
 	return
 }
 
-func CreateAutoScaleSecret(name string, namespace string, data map[string][]byte) error {
-	if DefaultConfig == nil {
-		DefaultConfig, _ = GenerateKubernetesConfig()
+func CreateAutoScaleSecret(name string, namespace string, data map[string][]byte, config *rest.Config) error {
+	if config == nil {
+		config = DefaultConfig
 	}
-	client, err := kubernetes.NewForConfig(DefaultConfig)
+	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return fmt.Errorf("error getting kubeconfig: %v", err)
 	}
@@ -185,11 +186,11 @@ func CreateAutoScaleSecret(name string, namespace string, data map[string][]byte
 	return nil
 }
 
-func CreateAutoScaleDeployment(agentPool string, min int32, max int32) error {
-	if DefaultConfig == nil {
-		DefaultConfig, _ = GenerateKubernetesConfig()
+func CreateAutoScaleDeployment(agentPool string, min int32, max int32, config *rest.Config) error {
+	if config == nil {
+		config = DefaultConfig
 	}
-	client, err := kubernetes.NewForConfig(DefaultConfig)
+	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return fmt.Errorf("error getting kubeconfig: %v", err)
 	}

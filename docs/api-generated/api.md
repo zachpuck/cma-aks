@@ -17,6 +17,7 @@
     - [DeleteClusterMsg](#cmaaks.DeleteClusterMsg)
     - [DeleteClusterReply](#cmaaks.DeleteClusterReply)
     - [EnableClusterAutoscalingMsg](#cmaaks.EnableClusterAutoscalingMsg)
+    - [EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup](#cmaaks.EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup)
     - [EnableClusterAutoscalingReply](#cmaaks.EnableClusterAutoscalingReply)
     - [GetClusterListMsg](#cmaaks.GetClusterListMsg)
     - [GetClusterListReply](#cmaaks.GetClusterListReply)
@@ -57,6 +58,7 @@
     - [DeleteClusterMsg](#cmaaks.DeleteClusterMsg)
     - [DeleteClusterReply](#cmaaks.DeleteClusterReply)
     - [EnableClusterAutoscalingMsg](#cmaaks.EnableClusterAutoscalingMsg)
+    - [EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup](#cmaaks.EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup)
     - [EnableClusterAutoscalingReply](#cmaaks.EnableClusterAutoscalingReply)
     - [GetClusterListMsg](#cmaaks.GetClusterListMsg)
     - [GetClusterListReply](#cmaaks.GetClusterListReply)
@@ -309,9 +311,25 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  | Name of the cluster |
+| nodegroups | [EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup](#cmaaks.EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup) | repeated | Groups to add autoscaling on Currently only one node group is allowed in AKS, will work with more than 1 entry later |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to access the cluster |
+
+
+
+
+
+
+<a name="cmaaks.EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup"></a>
+
+### EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of node group |
 | min_quantity | [int32](#int32) |  | Minimum number of nodes for autoscaling |
 | max_quantity | [int32](#int32) |  | Maximum number of nodes for autoscaling |
-| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to access the cluster |
 
 
 
@@ -888,9 +906,25 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  | Name of the cluster |
+| nodegroups | [EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup](#cmaaks.EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup) | repeated | Groups to add autoscaling on Currently only one node group is allowed in AKS, will work with more than 1 entry later |
+| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to access the cluster |
+
+
+
+
+
+
+<a name="cmaaks.EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup"></a>
+
+### EnableClusterAutoscalingMsg.AzureAutoscalingNodeGroup
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Name of node group |
 | min_quantity | [int32](#int32) |  | Minimum number of nodes for autoscaling |
 | max_quantity | [int32](#int32) |  | Maximum number of nodes for autoscaling |
-| credentials | [AzureCredentials](#cmaaks.AzureCredentials) |  | Credentials to access the cluster |
 
 
 

@@ -385,15 +385,23 @@ message ScaleClusterReply {
     // Status of the request
     string status = 2;
 }
+
 message EnableClusterAutoscalingMsg {
     // Name of the cluster
     string name = 1;
-    // Minimum number of nodes for autoscaling
-    int32 min_quantity = 2;
-    // Maximum number of nodes for autoscaling
-    int32 max_quantity = 3;
+    // Groups to add autoscaling on
+    // Currently only one node group is allowed in AKS, will work with more than 1 entry later
+    repeated AzureAutoscalingNodeGroup nodegroups = 2;
     // Credentials to access the cluster
     AzureCredentials credentials = 4;
+    message AzureAutoscalingNodeGroup {
+        // Name of node group
+        string name = 1;
+        // Minimum number of nodes for autoscaling
+        int32 min_quantity = 2;
+        // Maximum number of nodes for autoscaling
+        int32 max_quantity = 3;
+    }
 }
 
 message EnableClusterAutoscalingReply {
