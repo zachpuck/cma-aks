@@ -295,7 +295,7 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | ok | [bool](#bool) |  | Could the cluster be destroyed |
-| status | [string](#string) |  | Status of the request |
+| status | [ClusterStatus](#cmaaks.ClusterStatus) |  | Status of the request |
 
 
 
@@ -553,7 +553,7 @@ Reply for version request
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | ok | [bool](#bool) |  | wheather or not the cluster was scaled |
-| status | [string](#string) |  | Status of the request |
+| status | [ClusterStatus](#cmaaks.ClusterStatus) |  | Status of the request |
 
 
 
@@ -890,7 +890,7 @@ Tags are name/value pairs that enable you to categorize resources and view conso
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | ok | [bool](#bool) |  | Could the cluster be destroyed |
-| status | [string](#string) |  | Status of the request |
+| status | [ClusterStatus](#cmaaks.ClusterStatus) |  | Status of the request |
 
 
 
@@ -1148,7 +1148,7 @@ Reply for version request
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | ok | [bool](#bool) |  | wheather or not the cluster was scaled |
-| status | [string](#string) |  | Status of the request |
+| status | [ClusterStatus](#cmaaks.ClusterStatus) |  | Status of the request |
 
 
 

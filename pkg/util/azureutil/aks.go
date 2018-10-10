@@ -160,7 +160,7 @@ func (a *AKS) DeleteCluster(input DeleteClusterInput) (DeleteClusterOutput, erro
 	}
 
 	output := DeleteClusterOutput{
-		Status: "Deleting " + input.Name + " cluster",
+		Status: "Deleting",
 	}
 
 	return output, err
