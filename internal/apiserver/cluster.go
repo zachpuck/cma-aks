@@ -89,6 +89,10 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 
 	enumeratedStatus := matchStatus(output.Status)
 
+	if enumeratedStatus != pb.ClusterStatus_PROVISIONING {
+		logger.Errorf("expected status -->%s<-- on provision but instead received -->%s<-- on cluster -->%s<--! ... ", pb.ClusterStatus_PROVISIONING, enumeratedStatus, in.Name)
+	}
+
 	return &pb.CreateClusterReply{
 		Ok: true,
 		Cluster: &pb.ClusterItem{
