@@ -162,6 +162,10 @@ func (s *Server) DeleteCluster(ctx context.Context, in *pb.DeleteClusterMsg) (*p
 	}
 	enumeratedStatus := matchStatus(output.Status)
 
+	if enumeratedStatus != pb.ClusterStatus_STOPPING {
+		logger.Errorf("expected status -->%s<-- on stopping but instead received -->%s<-- on cluster -->%s<--! ... ", pb.ClusterStatus_PROVISIONING, enumeratedStatus, in.Name)
+	}
+
 	return &pb.DeleteClusterReply{
 		Ok:     true,
 		Status: pb.ClusterStatus(enumeratedStatus),
