@@ -9,16 +9,6 @@ import (
 	k8s "github.com/samsung-cnct/cma-aks/pkg/util/k8s"
 )
 
-//const (
-//	ClusterStatus_Provisioning = "PROVISIONING"             // Creating
-//	ClusterStatus_Running = "RUNNING"                       // Succeeded
-//	ClusterStatus_Reconciling = "RECONCILING"               // Updating/Upgrading
-//	ClusterStatus_Stopping = "STOPPING"                     // Deleting
-//	ClusterStatus_Status_Unspecified = "STATUS_UNSPECIFIED" // Unknown, catch all
-//	ClusterStatus_Error = "ERROR"
-//	ClusterStatus_Degraded = "DEGRADED"
-//)
-
 // match azure cluster status to api status enum
 func matchStatus(status string) pb.ClusterStatus {
 	switch s := status; s {
