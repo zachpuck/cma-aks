@@ -164,8 +164,10 @@ message DeleteClusterMsg {
 message DeleteClusterReply {
     // Could the cluster be destroyed
     bool ok = 1;
+    // Additional information about the status of the cluster
+    string status_message = 2;
     // Status of the request
-    ClusterStatus status = 2;
+    ClusterStatus status = 3;
 }
 
 message GetClusterListMsg {
