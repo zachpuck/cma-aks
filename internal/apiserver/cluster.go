@@ -9,6 +9,26 @@ import (
 	k8s "github.com/samsung-cnct/cma-aks/pkg/util/k8s"
 )
 
+// match azure cluster status to api status enum
+func matchStatus(status string) pb.ClusterStatus {
+	switch s := status; s {
+	case "Creating":
+		return pb.ClusterStatus_PROVISIONING
+	case "Updating":
+		return pb.ClusterStatus_RECONCILING
+	case "Upgrading":
+		return pb.ClusterStatus_RECONCILING
+	case "Succeeded":
+		return pb.ClusterStatus_RUNNING
+	case "Deleting":
+		return pb.ClusterStatus_STOPPING
+	case "Failed":
+		return pb.ClusterStatus_ERROR
+	default:
+		return pb.ClusterStatus_STATUS_UNSPECIFIED
+	}
+}
+
 func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*pb.CreateClusterReply, error) {
 
 	// check if resource group exists
@@ -52,7 +72,7 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 	}
 
 	// create cluster
-	_, err = aks.CreateCluster(az.CreateClusterInput{
+	output, err := aks.CreateCluster(az.CreateClusterInput{
 		Name:         in.Name,
 		Location:     in.Provider.Azure.Location,
 		K8sVersion:   in.Provider.K8SVersion,
@@ -67,12 +87,18 @@ func (s *Server) CreateCluster(ctx context.Context, in *pb.CreateClusterMsg) (*p
 
 	clusterID := "/subscriptions/" + in.Provider.Azure.Credentials.SubscriptionId + "/resourcegroups/" + in.Name + "-group/providers/Microsoft.ContainerService/managedClusters/" + in.Name
 
+	enumeratedStatus := matchStatus(output.Status)
+
+	if enumeratedStatus != pb.ClusterStatus_PROVISIONING {
+		logger.Errorf("expected status -->%s<-- on provision but instead received -->%s<-- on cluster -->%s<--! ... ", pb.ClusterStatus_PROVISIONING, enumeratedStatus, in.Name)
+	}
+
 	return &pb.CreateClusterReply{
 		Ok: true,
 		Cluster: &pb.ClusterItem{
 			Id:     clusterID,
 			Name:   in.Name,
-			Status: pb.ClusterStatus_PROVISIONING,
+			Status: pb.ClusterStatus(enumeratedStatus),
 		},
 	}, nil
 }
@@ -99,11 +125,7 @@ func (s *Server) GetCluster(ctx context.Context, in *pb.GetClusterMsg) (*pb.GetC
 	if err != nil {
 		return nil, err
 	}
-	// TODO make this better
-	enumeratedStatus, found := pb.ClusterStatus_value[output.Cluster.Status]
-	if !found {
-		enumeratedStatus = 0
-	}
+	enumeratedStatus := matchStatus(output.Cluster.Status)
 
 	return &pb.GetClusterReply{
 		Ok: true,
@@ -138,10 +160,15 @@ func (s *Server) DeleteCluster(ctx context.Context, in *pb.DeleteClusterMsg) (*p
 	if err != nil {
 		return nil, err
 	}
+	enumeratedStatus := matchStatus(output.Status)
+
+	if enumeratedStatus != pb.ClusterStatus_STOPPING {
+		logger.Errorf("expected status -->%s<-- on stopping but instead received -->%s<-- on cluster -->%s<--! ... ", pb.ClusterStatus_PROVISIONING, enumeratedStatus, in.Name)
+	}
 
 	return &pb.DeleteClusterReply{
 		Ok:     true,
-		Status: output.Status,
+		Status: pb.ClusterStatus(enumeratedStatus),
 	}, nil
 }
 
@@ -169,9 +196,12 @@ func (s *Server) GetClusterList(ctx context.Context, in *pb.GetClusterListMsg) (
 	var clusters []*pb.ClusterItem
 
 	for i := range output.Clusters {
+		enumeratedStatus := matchStatus(*output.Clusters[i].ProvisioningState)
+
 		cluster := pb.ClusterItem{
-			Id:   *output.Clusters[i].ID,
-			Name: *output.Clusters[i].Name,
+			Id:     *output.Clusters[i].ID,
+			Name:   *output.Clusters[i].Name,
+			Status: pb.ClusterStatus(enumeratedStatus),
 		}
 		clusters = append(clusters, &cluster)
 	}
@@ -239,7 +269,7 @@ func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (
 	aks.SetClient(newClient.Client)
 
 	// upgrade cluster
-	_, err = aks.UpgradeCluster(az.UpgradeClusterInput{
+	output, err := aks.UpgradeCluster(az.UpgradeClusterInput{
 		Name:       in.Name,
 		K8sVersion: in.Provider.K8SVersion,
 	})
@@ -249,12 +279,14 @@ func (s *Server) UpgradeCluster(ctx context.Context, in *pb.UpgradeClusterMsg) (
 
 	clusterID := "/subscriptions/" + in.Provider.Azure.Credentials.SubscriptionId + "/resourcegroups/" + in.Name + "-group/providers/Microsoft.ContainerService/managedClusters/" + in.Name
 
+	enumeratedStatus := matchStatus(output.Status)
+
 	return &pb.UpgradeClusterReply{
 		Ok: true,
 		Cluster: &pb.ClusterItem{
 			Id:     clusterID,
 			Name:   in.Name,
-			Status: pb.ClusterStatus_RECONCILING,
+			Status: pb.ClusterStatus(enumeratedStatus),
 		},
 	}, nil
 }
@@ -313,9 +345,11 @@ func (s *Server) ScaleCluster(ctx context.Context, in *pb.ScaleClusterMsg) (repl
 		return nil, fmt.Errorf("error scaling cluster: %v", err)
 	}
 
+	enumeratedStatus := matchStatus(output.Status)
+
 	return &pb.ScaleClusterReply{
 		Ok:     true,
-		Status: output.Status,
+		Status: pb.ClusterStatus(enumeratedStatus),
 	}, nil
 }
 

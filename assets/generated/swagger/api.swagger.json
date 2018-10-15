@@ -675,8 +675,12 @@
           "format": "boolean",
           "title": "Could the cluster be destroyed"
         },
-        "status": {
+        "status_message": {
           "type": "string",
+          "title": "Additional information about the status of the cluster"
+        },
+        "status": {
+          "$ref": "#/definitions/cmaaksClusterStatus",
           "title": "Status of the request"
         }
       }
@@ -825,7 +829,7 @@
           "title": "wheather or not the cluster was scaled"
         },
         "status": {
-          "type": "string",
+          "$ref": "#/definitions/cmaaksClusterStatus",
           "title": "Status of the request"
         }
       }

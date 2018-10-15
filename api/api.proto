@@ -164,8 +164,10 @@ message DeleteClusterMsg {
 message DeleteClusterReply {
     // Could the cluster be destroyed
     bool ok = 1;
+    // Additional information about the status of the cluster
+    string status_message = 2;
     // Status of the request
-    string status = 2;
+    ClusterStatus status = 3;
 }
 
 message GetClusterListMsg {
@@ -383,7 +385,7 @@ message ScaleClusterReply {
     // wheather or not the cluster was scaled
     bool ok = 1;
     // Status of the request
-    string status = 2;
+    ClusterStatus status = 2;
 }
 
 message EnableClusterAutoscalingMsg {
