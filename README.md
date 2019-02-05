@@ -31,3 +31,16 @@ To generate code:
 ```bash
 $ make -f build/Makefile generators
 ```
+
+## Debug:
+
+**Using Opctl**:
+
+requirements:
+1. docker
+2. [opctl](https://opctl.io/docs/getting-started/opctl.html#installation)
+
+steps:
+1. start debug op: `opctl run debug`
+
+This will start a container running `cma-aks`

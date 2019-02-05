@@ -1,0 +1,22 @@
+name: debug
+description: debug cma-aks locally
+inputs:
+  srcDir:
+    dir:
+      default: .
+      description: directory containing the projects source code
+run:
+  container:
+    name: cma-aks
+    image: { ref: 'golang:1.10-alpine' }
+    dirs:
+      /go/src/github.com/samsung-cnct/cma-aks: $(srcDir)
+    ports:
+      '9030': '9030'
+    cmd:
+      - sh
+      - -ce
+      - |
+        echo "starting cma-aks debug"
+        go run cmd/cma-aks/main.go
+    workDir: /go/src/github.com/samsung-cnct/cma-aks
