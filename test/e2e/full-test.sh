@@ -100,7 +100,12 @@ test_ready(){
     return 1
   fi
 
-  echo "Nodes READY"
+  if echo $nodes | grep -o Ready; then
+    echo "Node(s) Ready"
+  else
+    return 1
+  fi
+
   return 0
 }
 
