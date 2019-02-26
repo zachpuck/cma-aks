@@ -5,7 +5,7 @@
 
 name: cma-aks
 image:
-   repo: quay.io/samsung_cnct/cma-aks:0.1.6
+   repo: quay.io/samsung_cnct/cma-aks:0.1.7
    pullPolicy: Always
 
 port: 80
