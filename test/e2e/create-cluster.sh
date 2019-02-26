@@ -1,10 +1,11 @@
 #!/bin/bash
 
-CLUSTER_API=${CLUSTER_API:-cluster-manager-api.cnct.io}
-CLUSTER_API_PORT=${CLUSTER_API_PORT:-443}
-K8S_VERSION=${K8S_VERSION:-1.11.5}
-CMA_CALLBACK_URL=${CMA_CALLBACK_URL:-https://webhook.site/#/15a7f31c-5b57-41fc-bd70-a8dec0f56442}
-CMA_CALLBACK_REQUESTID=${CMA_CALLBACK_REQUESTID:-56789}
+CLUSTER_API_HTTP=${CLUSTER_API_HTTP:-http}
+CLUSTER_API=${CLUSTER_API:-cluster-manager-api-cluster-manager-api}
+CLUSTER_API_PORT=${CLUSTER_API_PORT:-80}
+K8S_VERSION=${K8S_VERSION:-1.12.5}
+CMA_CALLBACK_URL=${CMA_CALLBACK_URL:-https://example.cnct.io}
+CMA_CALLBACK_REQUESTID=${CMA_CALLBACK_REQUESTID:-1}
 
 # azure specific inputs
 AZURE_LOCATION=${AZURE_LOCATION:-westus}
@@ -81,7 +82,7 @@ main() {
   required_envs
 
   curl -X POST \
-    "https://${CLUSTER_API}:${CLUSTER_API_PORT}/api/v1/cluster" \
+    "${CLUSTER_API_HTTP}://${CLUSTER_API}:${CLUSTER_API_PORT}/api/v1/cluster" \
     -H 'Cache-Control: no-cache' \
     -H 'Content-Type: application/json' \
     -d "${DATA}" \
