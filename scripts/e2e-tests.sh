@@ -28,13 +28,15 @@ kubectl create namespace cert-manager
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
 helm repo update
 helm install --name cert-manager --namespace cert-manager stable/cert-manager
-sleep 20
+sleep 30
 helm install --name nginx-ingress stable/nginx-ingress
 
 helm repo add cnct https://charts.cnct.io
 helm install --name cma-aks --set image.repo=quay.io/samsung_cnct/cma-aks:${PIPELINE_DOCKER_TAG} cnct/cma-aks
 helm install -f test/e2e/cma-values.yaml --name cluster-manager-api cnct/cluster-manager-api
 helm install -f test/e2e/cma-operator-values.yaml --name cma-operator cnct/cma-operator
+
+sleep 120
 
 helm tiller stop
 
@@ -44,6 +46,6 @@ docker cp test/e2e/ kind-control-plane:/root/
 apk add gettext
 envsubst < test/e2e/run-tests-job.yaml | kubectl apply -f -
 # wait for tests to complete TODO: adjust timeout as necessary
-kubectl wait --for=condition=complete job/cma-aks-e2e-tests --timeout=40m
+kubectl wait --for=condition=complete job/cma-aks-e2e-tests --timeout=36m
 # output logs after job completes
 kubectl logs job/cma-aks-e2e-tests -n pipeline-tools
